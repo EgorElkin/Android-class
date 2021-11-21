@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuChannels"
+        android:enabled="true"
+        android:icon="@drawable/baseline_channels"
+        android:title="@string/menu_channels_title"
+        android:menuCategory="container"/>
+
+    <item
+        android:id="@+id/menuPeople"
+        android:enabled="true"
+        android:icon="@drawable/baseline_people"
+        android:title="@string/menu_people_title"
+        android:menuCategory="container"/>
+
+    <item
+        android:id="@+id/menuProfile"
+        android:enabled="true"
+        android:icon="@drawable/baseline_profile"
+        android:title="@string/menu_profile_title"
+        android:menuCategory="container"/>
+
+</menu>

@@ -7,4 +7,67 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="online">#FF00FF00</color>
+    <color name="idle">#FFFFAA00</color>
+    <color name="offline">#FFFF0000</color>
+    <color name="green_common">#2A9D8F</color>
+    <color name="black_dark">#FF070707</color>
+    <color name="background_black">#FF0E0E0E</color>
+    <color name="black_common_background">#121212</color>
+    <color name="background_gray_dark">#FF1E1E1E</color>
+    <color name="background_gray_light">#FF3A3A3A</color>
+
+    <color name="text_white">#FFFFFFFF</color>
+    <color name="text_gray_light">#FF999999</color>
+    <color name="hint">#FFCCCCCC</color>
+    <color name="underline">#FF323232</color>
+
+
+    <color name="navigation_background">#1C1C1C</color>
+    <color name="navigation_unselected">#919191</color>
+    <color name="navigation_selected">#FFFFFF</color>
+
+    <color name="chat_incoming_message_background">#1C1C1C</color>
+    <color name="chat_incoming_message_text">#FFFFFF</color>
+    <color name="chat_outgoing_message_background">#2A9D8F</color>
+    <color name="chat_outgoing_message_text">#FFFFFF</color>
+    <color name="chat_date_background">@color/black_dark</color>
+    <color name="chat_date_text">@color/text_gray_light</color>
+    <color name="chat_bottom_dialog_background">@color/background_gray_dark</color>
+    <color name="chat_title_background">#1C1C1C</color>
+    <color name="chat_appbar_background">#2A9D8F</color>
+    <color name="chat_appbar_text">#FFFFFF</color>
+    <color name="emoji_unselected_background">@color/background_gray_dark</color>
+    <color name="emoji_unselected_text">#CCCCCC</color>
+    <color name="emoji_selected_background">@color/background_gray_light</color>
+    <color name="emoji_selected_text">#EAEAEA</color>
+    <color name="chat_edit_text_background">#282828</color>
+    <color name="chat_edit_text_hint">#CCCCCC</color>
+    <color name="chat_edit_text">#FFFFFF</color>
+    <color name="chat_add_button">#3A3A3A</color>
+    <color name="chat_back_button">#FFFFFF</color>
+
+    <color name="channels_background">@color/background_gray_dark</color>
+    <color name="channels_search_background">@color/background_gray_dark</color>
+    <color name="channels_search_text">#FFFFFF</color>
+    <color name="channels_tabs_background">@color/background_gray_dark</color>
+    <color name="channels_tabs_text">#FFFFFF</color>
+    <color name="channels_tabs_underline">@color/green_common</color>
+    <color name="channels_stream_text">#FFFFFF</color>
+    <color name="channels_topic_text">#FFFFFF</color>
+    <color name="channels_stream_unexpanded">#919191</color>
+    <color name="channels_stream_expanded">#FFFFFF</color>
+    <color name="channels_divider">#282828</color>
+
+    <color name="people_background">@color/black_common_background</color>
+    <color name="people_appbar_background">#1C1C1C</color>
+    <color name="people_name">#FFFFFF</color>
+    <color name="people_email">#A1A1A1</color>
+    <color name="people_search_text">#FFFFFF</color>
+    <color name="people_progressbar">@color/background_gray_dark</color>
+
+    <color name="profile_name">#FFFFFF</color>
+    <color name="profile_bio">#BCBCBC</color>
+
 </resources>
