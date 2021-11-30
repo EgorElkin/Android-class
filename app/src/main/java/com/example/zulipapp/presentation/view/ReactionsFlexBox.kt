@@ -24,10 +24,8 @@ class ReactionsFlexBox @JvmOverloads constructor(
         var height = 0
         var highest = 0
         var maxWidth = 0
-//        print("debug: PARENT widthSize=$widthSize ")
         when (widthMode) {
             MeasureSpec.UNSPECIFIED -> {
-//                println("debug: Parent: UNSPECIFIED")
                 for (i in 0 until childCount) {
                     val child = getChildAt(i)
                     measureChild(child)
@@ -39,7 +37,6 @@ class ReactionsFlexBox @JvmOverloads constructor(
                 width += horizontalPadding * (childCount - 1)
             }
             MeasureSpec.AT_MOST -> {
-//                println("debug: Parent: AT MOST")
                 var currentPadding = 0
                 for (i in 0 until childCount) {
                     val child = getChildAt(i)
@@ -47,15 +44,12 @@ class ReactionsFlexBox @JvmOverloads constructor(
                     val childWidth = child.measuredWidth
                     val childHeight = child.measuredHeight
                     if (width + currentPadding + childWidth <= widthSize) {
-//                        println("debug: for: $i помещается width=$childWidth height=$childHeight")
                         width += childWidth
                         currentPadding += horizontalPadding
                         if (highest < childHeight) {
                             highest = childHeight
                         }
-//                        println("debug: currentWidth=$width currentHeight=$height")
                     } else {
-//                        println("debug: for: $i не помещается width=$childWidth height=$childHeight")
                         if (maxWidth < width + currentPadding - horizontalPadding) {
                             maxWidth = width + currentPadding - horizontalPadding
                         }
@@ -63,14 +57,12 @@ class ReactionsFlexBox @JvmOverloads constructor(
                         currentPadding = horizontalPadding
                         height += highest + verticalPadding
                         highest = childHeight
-//                        println("debug: currentWidth=$width currentHeight=$height")
                     }
                 }
                 height += highest
                 width = maxOf(width + currentPadding - horizontalPadding, maxWidth)
             }
             MeasureSpec.EXACTLY -> {
-//                println("debug: Parent: EXACTLY")
                 var currentPadding = 0
                 for (i in 0 until childCount) {
                     val child = getChildAt(i)
@@ -78,14 +70,12 @@ class ReactionsFlexBox @JvmOverloads constructor(
                     val childWidth = child.measuredWidth
                     val childHeight = child.measuredHeight
                     if (width + currentPadding + childWidth <= widthSize) {
-//                        println("debug: for: $i помещается width=$childWidth height=$childHeight")
                         width += childWidth
                         currentPadding += horizontalPadding
                         if (highest < childHeight) {
                             highest = childHeight
                         }
                     } else {
-//                        println("debug: for: $i не помещается width=$childWidth height=$childHeight")
                         width = childWidth
                         currentPadding = horizontalPadding
                         height += highest + verticalPadding
@@ -96,14 +86,11 @@ class ReactionsFlexBox @JvmOverloads constructor(
                 width = widthSize
             }
         }
-//        println("debug: Parent: resultWidth=$width resultHeight=$height")
         setMeasuredDimension(width + paddingStart + paddingEnd, height + paddingTop + paddingBottom)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val width = measuredWidth - paddingEnd
-
-//        println("debug: Parent onLayout() measuredWidth=$measuredWidth width=${getWidth()} measuredHeight=$measuredHeight height=$height")
 
         var currentLeft = paddingStart
         var currentTop = paddingTop
@@ -115,7 +102,6 @@ class ReactionsFlexBox @JvmOverloads constructor(
             val childWidth = child.measuredWidth
             val childHeight = child.measuredHeight
             if (currentLeft + childWidth <= width) {
-//                println("debug: onLayout() $i поместился width=$childWidth height=$childHeight")
                 child.layout(
                     currentLeft,
                     currentTop,
@@ -127,7 +113,6 @@ class ReactionsFlexBox @JvmOverloads constructor(
                     highest = currentTop + childHeight
                 }
             } else {
-//                println("debug: onLayout() $i не поместился width=$childWidth height=$childHeight")
                 currentTop = highest + verticalPadding
                 highest += verticalPadding + childHeight
                 currentLeft = paddingLeft
@@ -135,7 +120,7 @@ class ReactionsFlexBox @JvmOverloads constructor(
                     currentLeft,
                     currentTop,
                     currentLeft + childWidth,
-                    highest //currentTop + child.measuredHeight)
+                    highest
                 )
                 currentLeft += childWidth + horizontalPadding
             }

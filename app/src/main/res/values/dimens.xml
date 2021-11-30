@@ -14,7 +14,7 @@
     <dimen name="chat_bottom_emoji_text">40sp</dimen>
     <dimen name="chat_bottom_emoji_mas_height">200dp</dimen>
 
-    <dimen name="message_avatar_width">37</dimen>
+    <dimen name="message_avatar_width">37dp</dimen>
     <dimen name="message_avatar_height">37dp</dimen>
 
     <dimen name="channels_search_text">24sp</dimen>
@@ -31,6 +31,7 @@
     <dimen name="profile_avatar_height">185dp</dimen>
     <dimen name="profile_status_text">16sp</dimen>
     <dimen name="profile_appbar_text">24sp</dimen>
+    <dimen name="profile_avatar_corner_radius">30dp</dimen>
 
     <dimen name="reactions_horizontal_padding">10dp</dimen>
     <dimen name="reactions_vertical_padding">7dp</dimen>

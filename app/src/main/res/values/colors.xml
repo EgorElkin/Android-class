@@ -37,7 +37,7 @@
     <color name="chat_bottom_dialog_background">@color/background_gray_dark</color>
     <color name="chat_title_background">#1C1C1C</color>
     <color name="chat_appbar_background">#2A9D8F</color>
-    <color name="chat_appbar_text">#FFFFFF</color>
+    <color name="chat_appbar_text">@color/text_white</color>
     <color name="emoji_unselected_background">@color/background_gray_dark</color>
     <color name="emoji_unselected_text">#CCCCCC</color>
     <color name="emoji_selected_background">@color/background_gray_light</color>
@@ -65,7 +65,7 @@
     <color name="people_name">#FFFFFF</color>
     <color name="people_email">#A1A1A1</color>
     <color name="people_search_text">#FFFFFF</color>
-    <color name="people_progressbar">@color/background_gray_dark</color>
+    <color name="people_progressbar">@color/background_gray_light</color>
 
     <color name="profile_name">#FFFFFF</color>
     <color name="profile_bio">#BCBCBC</color>

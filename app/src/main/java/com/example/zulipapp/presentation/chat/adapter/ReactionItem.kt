@@ -1,4 +1,4 @@
-package com.example.zulipapp.presentation.entity
+package com.example.zulipapp.presentation.chat.adapter
 
 class ReactionItem(
     val emojiName: String,

@@ -1,8 +1,15 @@
 package com.example.zulipapp.presentation.profile
 
-interface ProfileView {
+import com.example.zulipapp.domain.entity.User
+import com.example.zulipapp.presentation.base.MvpView
 
-    fun showUser(userName: String)
+interface ProfileView : MvpView {
 
-    fun showError(message: String)
+    fun showUser(profile: ProfileItem)
+
+    fun showError(errorRes: Int)
+
+    fun showLoading()
+
+    fun hideLoading()
 }

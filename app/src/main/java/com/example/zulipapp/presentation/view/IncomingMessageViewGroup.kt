@@ -11,7 +11,8 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.example.zulipapp.R
-import com.example.zulipapp.presentation.entity.ReactionItem
+import com.example.zulipapp.presentation.chat.adapter.ReactionItem
+import com.example.zulipapp.presentation.util.EmojiCodeMapper
 
 class IncomingMessageViewGroup  @JvmOverloads constructor(
     context: Context,
@@ -39,10 +40,10 @@ class IncomingMessageViewGroup  @JvmOverloads constructor(
         messageView = getChildAt(MESSAGE_INDEX) as TextView
         reactionsView = getChildAt(REACTIONS_INDEX) as ReactionsFlexBox
 
-        plusView.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.baseline_plus, context.theme))
+        plusView.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.button_plus_reaction, context.theme))
     }
 
-    fun setOnPlusClickListener(listener: View.OnClickListener){
+    fun setOnPlusClickListener(listener: OnClickListener){
         onPlusClickListener = listener
         plusView.setOnClickListener(onPlusClickListener)
     }
@@ -115,7 +116,7 @@ class IncomingMessageViewGroup  @JvmOverloads constructor(
         val reactionView = ReactionView(context)
         reactionView.setOnClickListener(clickListener)
         reactionView.background = ResourcesCompat.getDrawable(resources, R.drawable.reaction_view_bg, context.theme)
-        reactionView.emoji = reactionItem.emojiCode
+        reactionView.emoji = EmojiCodeMapper.codeToEmoji(reactionItem.emojiCode)
         reactionView.counter = reactionItem.userIds.size.toString()
 
         if (reactionsView.childCount == 0){
@@ -132,7 +133,7 @@ class IncomingMessageViewGroup  @JvmOverloads constructor(
             val reactionView = ReactionView(context)
             reactionView.setOnClickListener(clickListener)
             reactionView.background = ResourcesCompat.getDrawable(resources, R.drawable.reaction_view_bg, context.theme)
-            reactionView.emoji = reaction.emojiCode
+            reactionView.emoji = EmojiCodeMapper.codeToEmoji(reaction.emojiCode)
             reactionView.counter = reaction.userIds.size.toString()
             reactionsView.addView(reactionView)
         }

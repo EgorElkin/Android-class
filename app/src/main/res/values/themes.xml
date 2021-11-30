@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.ZulipApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@android:color/holo_green_light</item>
-        <item name="colorPrimaryVariant">@android:color/holo_red_light</item>
+        <item name="colorPrimary">@color/green_common</item>
+        <item name="colorPrimaryVariant">@color/background_gray_dark</item>
         <item name="colorOnPrimary">@color/teal_200</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>

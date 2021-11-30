@@ -52,7 +52,6 @@ class ReactionView @JvmOverloads constructor(
                 R.styleable.ReactionView_textColor,
                 ResourcesCompat.getColor(resources, R.color.text_gray_light, context.theme)
             )
-//            ("make Selector for Color")
         }
 
         resolvePaddings()
