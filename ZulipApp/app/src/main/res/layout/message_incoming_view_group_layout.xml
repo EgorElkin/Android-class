@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:layout_width="@dimen/message_avatar_width"
+        android:layout_height="@dimen/message_avatar_height"
+        android:contentDescription="@string/incoming_message_image_view_description" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/message_name_text_size"
+        android:textColor="@color/green_common"
+        android:background="@drawable/message_incoming_name_bg"
+        android:paddingLeft="10dp"
+        android:paddingRight="8dp"
+        android:paddingTop="@dimen/message_name_top_padding" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/message_text_size"
+        android:textColor="@color/text_white"
+        android:background="@drawable/message_incoming_message_bg"
+        android:paddingLeft="10dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="@dimen/message_frame_bottom_padding"/>
+
+    <com.example.zulipapp.presentation.view.ReactionsFlexBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</merge>

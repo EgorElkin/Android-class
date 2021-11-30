@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateTextView"
+        android:textColor="@color/chat_date_text"
+        android:background="@drawable/chat_date_item_bg"
+        android:textSize="@dimen/chat_date_text"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="2dp"
+        android:layout_gravity="center_horizontal" />
+
+</FrameLayout>

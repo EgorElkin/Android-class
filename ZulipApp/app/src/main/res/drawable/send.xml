@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/send_background"/>
+    <item android:drawable="@drawable/baseline_send"
+        android:left="8dp"
+        android:top="6dp"
+        android:bottom="6dp"
+        android:right="4dp"/>
+</layer-list>
