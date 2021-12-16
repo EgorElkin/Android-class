@@ -3,12 +3,9 @@ package com.example.zulipapp.data.api
 import okhttp3.Credentials
 import okhttp3.Interceptor
 
-class BasicAuthInterceptor : Interceptor {
+class BasicAuthInterceptor(email: String, password: String) : Interceptor {
 
-    private val credentials = Credentials.basic(
-        "e.jolk@yahoo.com",
-        "6MtxtdXVOwu35cHkoiQ0xoog6rOMlyRm"
-    )
+    private val credentials = Credentials.basic(email, password)
 
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         var request = chain.request()

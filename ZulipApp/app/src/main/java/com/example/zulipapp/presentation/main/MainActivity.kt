@@ -7,7 +7,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.example.zulipapp.App
+import com.example.zulipapp.DaggerMainComponent
 import com.example.zulipapp.R
+import com.example.zulipapp.di.ActivityComponent
+import com.example.zulipapp.di.ChannelsComponent
+import com.example.zulipapp.di.DaggerActivityComponent
+import com.example.zulipapp.di.DaggerChannelsComponent
+import com.example.zulipapp.domain.repository.MessageRepository
+import com.example.zulipapp.domain.usecase.GetMessagesUseCase
 import com.example.zulipapp.presentation.Navigator
 import com.example.zulipapp.presentation.channels.ChannelsFragment
 import com.example.zulipapp.presentation.chat.ChatFragment
@@ -15,13 +23,19 @@ import com.example.zulipapp.presentation.people.PeopleFragment
 import com.example.zulipapp.presentation.profile.ProfileFragment
 import com.example.zulipapp.presentation.util.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() , Navigator{
 
     private lateinit var navigation: BottomNavigationView
     private lateinit var toolBar: Toolbar
 
+    lateinit var activityComponent: ActivityComponent
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        activityComponent = DaggerActivityComponent.factory().create((application as App).appComponent)
+//        activityComponent.inject(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -55,7 +69,6 @@ class MainActivity : AppCompatActivity() , Navigator{
                 else -> throw IllegalArgumentException("Bottom Navigation: Such menu item is not exist")
             }
         }
-
 
         if(savedInstanceState == null){
             fragmentManager.beginTransaction()

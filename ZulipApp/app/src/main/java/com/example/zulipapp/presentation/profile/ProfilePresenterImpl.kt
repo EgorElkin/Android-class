@@ -10,26 +10,29 @@ import com.example.zulipapp.domain.usecase.*
 import com.example.zulipapp.presentation.base.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 class ProfilePresenterImpl(profileView: ProfileView) : BasePresenter<ProfileView>(profileView) , ProfilePresenter{
 
-    private lateinit var  getUserUseCase: GetUserByIdUseCase
-    private lateinit var  getUserPresenceUseCase: GetUserStatusUseCase
+    @Inject
+    lateinit var  getUserUseCase: GetUserByIdUseCase
+    @Inject
+    lateinit var  getUserPresenceUseCase: GetUserStatusUseCase
 
     override fun attachView(view: ProfileView){
         super.attachView(view)
-        getUserUseCase = GetUserByIdUseCaseImpl(
-            UserRepositoryImpl(
-                NetworkUserDataSource(RetrofitBuilder.userApiService),
-                LocalUserDataSource((getView() as Fragment).requireContext())
-            )
-        )
-        getUserPresenceUseCase = GetUserStatusUseCaseImpl(
-            UserRepositoryImpl(
-                NetworkUserDataSource((RetrofitBuilder.userApiService)),
-                LocalUserDataSource((getView() as Fragment).requireContext())
-            )
-        )
+//        getUserUseCase = GetUserByIdUseCaseImpl(
+//            UserRepositoryImpl(
+//                NetworkUserDataSource(RetrofitBuilder.userApiService),
+//                LocalUserDataSource((getView() as Fragment).requireContext())
+//            )
+//        )
+//        getUserPresenceUseCase = GetUserStatusUseCaseImpl(
+//            UserRepositoryImpl(
+//                NetworkUserDataSource((RetrofitBuilder.userApiService)),
+//                LocalUserDataSource((getView() as Fragment).requireContext())
+//            )
+//        )
     }
 
     override fun viewIsReady(userId: Int) {

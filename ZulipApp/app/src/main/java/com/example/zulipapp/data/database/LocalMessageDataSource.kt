@@ -1,10 +1,13 @@
 package com.example.zulipapp.data.database
 
-import android.content.Context
+import com.example.zulipapp.data.database.dao.MessageDao
+import com.example.zulipapp.domain.entity.Message
+import io.reactivex.Single
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LocalMessageDataSource(applicationContext: Context) {
+class LocalMessageDataSource(private val messageDao: MessageDao) {
 
-    private val appDatabase = RoomBuilder.provideAppDatabase(applicationContext)
-
+//    fun getFromStream(streamId: Int): Single<List<Message>> = messageDao.getFromStream()
 
 }

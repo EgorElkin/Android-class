@@ -45,13 +45,17 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), ChannelsView {
         viewPager = view.findViewById(R.id.channelsViewPager)
 
         channelsSubscribedAdapter = ChannelsAdapter({
+            println("debug: StreamSelected: ${it.name}")
             presenter.streamSelected(it.name)
         },{
+            println("debug: TopicSelected: ${it.streamName}: ${it.name}")
             presenter.topicSelected(it.streamName, it.name)
         })
         channelsAllAdapter = ChannelsAdapter({
+            println("debug: StreamSelected: ${it.name}")
             presenter.streamSelected(it.name)
         },{
+            println("debug: TopicSelected: ${it.streamName}: ${it.name}")
             presenter.topicSelected(it.streamName, it.name)
         })
         viewPagerAdapter = ChannelsViewPagerAdapter(channelsSubscribedAdapter, channelsAllAdapter)

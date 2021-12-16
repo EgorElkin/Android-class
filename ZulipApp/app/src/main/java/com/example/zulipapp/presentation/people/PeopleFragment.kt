@@ -2,75 +2,79 @@ package com.example.zulipapp.presentation.people
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.example.zulipapp.R
+import com.example.zulipapp.databinding.FragmentPeopleBinding
+import com.example.zulipapp.di.DaggerPeopleComponent
 import com.example.zulipapp.presentation.Navigator
+import com.example.zulipapp.presentation.main.MainActivity
 import com.example.zulipapp.presentation.people.adapter.PeopleAdapter
-import com.example.zulipapp.presentation.people.adapter.UserItem
+import com.example.zulipapp.presentation.people.elm.PeopleEffect
+import com.example.zulipapp.presentation.people.elm.PeopleEvent
+import com.example.zulipapp.presentation.people.elm.PeopleState
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
 
-class PeopleFragment : Fragment(R.layout.fragment_people), PeopleView {
+class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>(R.layout.fragment_people){
 
-    private lateinit var presenter: PeoplePresenterImpl
+    private var _binding: FragmentPeopleBinding? = null
+    private val binding: FragmentPeopleBinding
+        get() = _binding!!
 
-    private lateinit var editText: EditText
-    private lateinit var searchButton: ImageButton
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: PeopleAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        editText = view.findViewById(R.id.peopleSearchEditText)
-        editText.doAfterTextChanged {
-            presenter.searchRequestChanged(it.toString())
+        _binding = FragmentPeopleBinding.bind(view)
+
+        binding.peopleSearchEditText.doAfterTextChanged {
+            store.accept(PeopleEvent.Ui.SearchPeople(it.toString()))
         }
 
-        searchButton = view.findViewById(R.id.peopleSearchButton)
-        searchButton.setOnClickListener {
-            presenter.searchRequestChanged(editText.text.toString())
+        binding.peopleSearchButton.setOnClickListener {
+            store.accept(PeopleEvent.Ui.SearchPeople(binding.peopleSearchEditText.text.toString()))
         }
 
-        recyclerView = view.findViewById(R.id.peopleRecyclerVIew)
-        recyclerView.setHasFixedSize(true)
+        binding.peopleRecyclerVIew.setHasFixedSize(true)
         adapter = PeopleAdapter {
-            presenter.userSelected(it.userId)
+            store.accept(PeopleEvent.Ui.UserSelected(it.userId))
+
         }
-        recyclerView.adapter = adapter
-
-        progressBar = view.findViewById(R.id.peopleProgressBar)
-
-        presenter = PeoplePresenterImpl(this, (this.activity as Navigator))
-        presenter.attachView(this)
-        presenter.viewIsReady()
+        binding.peopleRecyclerVIew.adapter = adapter
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.detachView()
+        _binding = null
     }
 
-    // PeopleView
-    override fun showUsers(users: List<UserItem>) {
-        adapter.submitList(users)
+    // ELM
+    override val initEvent: PeopleEvent
+        get() = PeopleEvent.Ui.Init
+
+    override fun createStore(): Store<PeopleEvent, PeopleEffect, PeopleState> {
+        return DaggerPeopleComponent.factory()
+            .create((requireActivity() as MainActivity).activityComponent).peopleStore
     }
 
-    override fun showLoading() {
-        progressBar.isVisible = true
+    override fun render(state: PeopleState) {
+        binding.peopleProgressBar.isVisible = state.isLoading
+        binding.peopleEmptyListTextView.isVisible = state.emptyList
+        binding.peopleEmptySearchTextView.isVisible = state.emptySearchResult
+        if(state.searchedUsers != null){
+            adapter.submitList(state.searchedUsers)
+        }
     }
 
-    override fun hideLoading() {
-        progressBar.isVisible = false
-    }
-
-    override fun showError(message: Int) {
-        Toast.makeText(requireContext(), getString(message), Toast.LENGTH_SHORT).show()
+    override fun handleEffect(effect: PeopleEffect) = when(effect){
+        is PeopleEffect.ShowLoadingError -> {
+            Toast.makeText(requireContext(), getString(R.string.people_loading_error), Toast.LENGTH_SHORT).show()
+        }
+        is PeopleEffect.NavigateToProfile -> {
+            (requireActivity() as Navigator).showProfile(effect.userId)
+        }
     }
 }

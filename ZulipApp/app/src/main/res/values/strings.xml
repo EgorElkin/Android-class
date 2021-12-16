@@ -7,17 +7,19 @@
     <string name="channels_tab_subscribed">Subscribed</string>
     <string name="channels_tab_all">All streams</string>
     <string name="people_avatar_description">Avatar</string>
-    <string name="channels_search_hint">Search...</string>
+    <string name="channels_search_hint">Search…</string>
     <string name="channels_search_button_description">Search Button</string>
-    <string name="people_search_hint">Users...</string>
-    <string name="chat_edit_text_hint">Написать...</string>
+    <string name="people_search_hint">Users…</string>
+    <string name="chat_edit_text_hint">Написать…</string>
     <string name="chat_send_button_description">Send Button</string>
     <string name="chat_back_button_description">Back Button</string>
     <string name="profile_avatar_description">Avatar</string>
     <string name="incoming_message_image_view_description">Avatar</string>
     <string name="profile_loading_error">Не удалось загрузить пользователя</string>
-    <string name="people_loading_error">Произошла ошибка при поиске</string>
+    <string name="people_loading_error">Произошла ошибка при загрузке</string>
     <string name="profile_toolbar_title">Profile</string>
     <string name="chat_toolbar_title">#%1$s</string>
     <string name="chat_empty_message_notice">Пустое сообщение</string>
+    <string name="people_empty_result_text">No Results</string>
+    <string name="people_empty_list_text">No People Yet</string>
 </resources>

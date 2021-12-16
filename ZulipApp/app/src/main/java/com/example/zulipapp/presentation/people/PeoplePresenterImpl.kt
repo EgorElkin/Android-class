@@ -15,10 +15,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class PeoplePresenterImpl(peopleView: PeopleView, private var navigator: Navigator?) : BasePresenter<PeopleView>(peopleView), PeoplePresenter {
 
-    private lateinit var  searchUserUseCase: SearchUserUseCase
+    @Inject
+    lateinit var  searchUserUseCase: SearchUserUseCase
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
 
     override fun detachView() {
@@ -29,12 +31,12 @@ class PeoplePresenterImpl(peopleView: PeopleView, private var navigator: Navigat
     override fun viewIsReady() {
         subscribeOnPublisher()
 
-        searchUserUseCase = SearchUserUseCaseImpl(
-            UserRepositoryImpl(
-                NetworkUserDataSource(RetrofitBuilder.userApiService),
-                LocalUserDataSource((getView() as Fragment).requireActivity().applicationContext)
-            )
-        )
+//        searchUserUseCase = SearchUserUseCaseImpl(
+//            UserRepositoryImpl(
+//                NetworkUserDataSource(RetrofitBuilder.userApiService),
+//                LocalUserDataSource((getView() as Fragment).requireActivity().applicationContext)
+//            )
+//        )
 
         searchUser(ALL_USERS)
     }

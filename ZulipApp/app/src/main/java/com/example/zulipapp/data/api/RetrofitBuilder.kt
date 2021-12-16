@@ -8,9 +8,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitBuilder {
 
     private const val BASE_URL = "https://tinkoff-android-fall21.zulipchat.com/api/v1/"
+    private const val EMAIL = "e.jolk@yahoo.com"
+    private const val PASSWORD = "6MtxtdXVOwu35cHkoiQ0xoog6rOMlyRm"
 
     private val client = OkHttpClient.Builder()
-        .addInterceptor(BasicAuthInterceptor())
+        .addInterceptor(BasicAuthInterceptor(EMAIL, PASSWORD))
         .build()
 
     private fun getRetrofit(): Retrofit {

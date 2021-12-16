@@ -2,12 +2,26 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_bg">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bottomSheetRecyclerView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/chat_bottom_emoji_mas_height"
-        android:background="@drawable/bottom_sheet_bg" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="60dp"
+            android:layout_height="6dp"
+            android:background="@drawable/bottom_sheet_top_element_bg"
+            android:layout_marginVertical="10dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bottomSheetRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/chat_bottom_emoji_mas_height" />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

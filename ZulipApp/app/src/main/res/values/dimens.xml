@@ -11,8 +11,8 @@
     <dimen name="chat_stream_text">24sp</dimen>
     <dimen name="chat_topic_text">20sp</dimen>
     <dimen name="chat_edit_text">20sp</dimen>
-    <dimen name="chat_bottom_emoji_text">40sp</dimen>
-    <dimen name="chat_bottom_emoji_mas_height">200dp</dimen>
+    <dimen name="chat_bottom_emoji_text">32sp</dimen>
+    <dimen name="chat_bottom_emoji_mas_height">300dp</dimen>
 
     <dimen name="message_avatar_width">37dp</dimen>
     <dimen name="message_avatar_height">37dp</dimen>
@@ -25,6 +25,7 @@
     <dimen name="people_search_text">24sp</dimen>
     <dimen name="people_name_text">22sp</dimen>
     <dimen name="people_email_text">16sp</dimen>
+    <dimen name="people_empty_result_text">24sp</dimen>
 
     <dimen name="profile_name_text">32sp</dimen>
     <dimen name="profile_avatar_width">185dp</dimen>

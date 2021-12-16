@@ -10,7 +10,8 @@ import java.lang.IllegalArgumentException
 class ChatAdapter(
     private val onEmojiClickListener: View.OnClickListener,
     private val onPlusClickListener: View.OnClickListener,
-    private val onLongClickListener: (item: ChatItem, position: Int) -> Unit
+    private val onLongClickListener: (item: ChatItem, position: Int) -> Unit,
+private val thresholdPassed: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messagesList: MutableList<ChatItem> = mutableListOf()
@@ -40,6 +41,9 @@ class ChatAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if(position == 5){
+            thresholdPassed(position)
+        }
         when(getItemViewType(position)){
             ChatItemViewType.INCOMING_MESSAGE.type -> (holder as IncomingMessageViewHolder).bind(messagesList[position] as ChatItem.MessageItem)
             ChatItemViewType.OUTGOING_MESSAGE.type -> (holder as OutgoingMessageViewHolder).bind(messagesList[position] as ChatItem.MessageItem)

@@ -68,8 +68,21 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ChatView{
         },{ item, position ->
             TODO("on Message Long CLick")
             true
+        },{
+            println("debug: Threshold Passed() position=$it")
         })
 
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                println("debug: scroll: ${recyclerView.canScrollVertically(-1)}")
+
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
 
         recyclerView.adapter = adapter
 
