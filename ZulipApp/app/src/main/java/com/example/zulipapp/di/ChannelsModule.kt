@@ -22,16 +22,6 @@ class ChannelsModule {
     @FragmentScope
     fun provideGetTopicsUseCase(streamRepository: StreamRepository): GetTopicsUseCase = GetTopicsUseCaseImpl(streamRepository)
 
-//    @Provides
-//    @SearchAllQualifier
-//    @FragmentScope
-//    fun provideSearchAllStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchAllStreamUseCaseImpl(streamRepository)
-//
-//    @Provides
-//    @SearchSubscribedQualifier
-//    @FragmentScope
-//    fun provideSearchSubscribedStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchSubscribedStreamUseCaseImpl(streamRepository)
-
     @Provides
     @FragmentScope
     fun provideChannelsState(): ChannelsState {
@@ -61,12 +51,4 @@ class ChannelsModule {
         reducer = channelsReducer,
         actor = channelsActor
     )
-
-//    @Qualifier
-//    @Retention(AnnotationRetention.RUNTIME)
-//    annotation class SearchAllQualifier
-//
-//    @Qualifier
-//    @Retention(AnnotationRetention.RUNTIME)
-//    annotation class SearchSubscribedQualifier
 }

@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.zulipapp.R
 import com.example.zulipapp.data.api.entity.message.Narrow
 import com.example.zulipapp.databinding.FragmentChatBinding
 import com.example.zulipapp.di.DaggerChatComponent
-import com.example.zulipapp.presentation.chat.adapter.*
+import com.example.zulipapp.presentation.chat.adapter.ChatAdapter
 import com.example.zulipapp.presentation.chat.elm.ChatEffect
 import com.example.zulipapp.presentation.chat.elm.ChatEvent
 import com.example.zulipapp.presentation.chat.elm.ChatState
