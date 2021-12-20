@@ -36,19 +36,12 @@ interface UserApiService {
 }
 
 interface MessageApiService {
-    @POST("messages")
-    fun postMessage(
-        @Query("type") type: String, // stream/private
-        @Query("to") streamId: Int,
-        @Query("topic") topicName: String,
-        @Query("content") content: String
-    ): Single<MessageSendResponse>
 
     @POST("messages")
     fun postMessage(
         @Query("type") type: String, // stream/private
         @Query("to") streamName: String, // Maximum message size of 10000 bytes
-        @Query("topic") topicName: String, // Maximum length of 60 characters
+        @Query("topic") topicName: String?, // Maximum length of 60 characters
         @Query("content") content: String
     ): Single<MessageSendResponse>
 

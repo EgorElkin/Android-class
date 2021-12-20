@@ -2,28 +2,26 @@ package com.example.zulipapp.presentation.chat
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.zulipapp.R
-import com.example.zulipapp.data.api.NetworkMessageDataSource
-import com.example.zulipapp.data.api.RetrofitBuilder
 import com.example.zulipapp.data.api.entity.message.Narrow
-import com.example.zulipapp.data.repository.MessageRepositoryImpl
-import com.example.zulipapp.domain.usecase.GetMessagesUseCase
-import com.example.zulipapp.domain.usecase.GetMessagesUseCaseImpl
+import com.example.zulipapp.databinding.FragmentChatBinding
+import com.example.zulipapp.di.DaggerChatComponent
 import com.example.zulipapp.presentation.chat.adapter.*
+import com.example.zulipapp.presentation.chat.elm.ChatEffect
+import com.example.zulipapp.presentation.chat.elm.ChatEvent
+import com.example.zulipapp.presentation.chat.elm.ChatState
 import com.example.zulipapp.presentation.chat.reactiondialog.EmojiItem
 import com.example.zulipapp.presentation.chat.reactiondialog.ReactionBottomDialog
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import com.example.zulipapp.presentation.main.MainActivity
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
 
-class ChatFragment : Fragment(R.layout.fragment_chat), ChatView{
+class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.fragment_chat){
 
     companion object{
         const val ARG_STREAM_KEY = "chat_stream_key"
@@ -39,28 +37,56 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ChatView{
         }
     }
 
-    private lateinit var presenter: ChatPresenterImpl
+    private var _binding: FragmentChatBinding? = null
+    private val binding: FragmentChatBinding
+        get() = _binding!!
 
-    private lateinit var headline: TextView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var editText: EditText
-    private lateinit var buttonSend: ImageButton
     private lateinit var adapter: ChatAdapter
+
+//    private var streamName: String? = null
+//    private var topicName: String? = null
+    private var narrows: List<Narrow> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentChatBinding.bind(view)
 
-        headline = view.findViewById(R.id.chatTopicHeadline)
-        editText = view.findViewById(R.id.chatEditText)
-        buttonSend = view.findViewById(R.id.chatButtonSend)
-        buttonSend.setOnClickListener {
-            presenter.sendMessageClicked(editText.text.toString())
+        val streamName = arguments?.getString(ARG_STREAM_KEY)
+        val topicName = arguments?.getString(ARG_TOPIC_KEY)
+        narrows = if(streamName == null){
+            emptyList()
+        } else {
+            if(topicName == null){
+                listOf(Narrow("stream", streamName))
+            } else {
+                listOf(Narrow("stream", streamName), Narrow("topic", topicName))
+            }
         }
 
-        recyclerView = view.findViewById(R.id.chatRecyclerView)
+        if(topicName != null){
+            binding.chatTopicHeadline.text = topicName
+        } else {
+            binding.chatTopicHeadline.visibility = View.GONE
+        }
+
+
+        binding.chatEditText.doAfterTextChanged {
+            if(it.toString().isEmpty()){
+                binding.chatButtonSend.background = ResourcesCompat.getDrawable(resources, R.drawable.baseline_add_circle, null)
+            } else {
+                binding.chatButtonSend.background = ResourcesCompat.getDrawable(resources, R.drawable.send, null)
+            }
+        }
+
+        binding.chatButtonSend.setOnClickListener {
+            if (streamName != null){
+                store.accept(ChatEvent.Ui.SendButtonClicked("stream", streamName, topicName, binding.chatEditText.text.toString()))
+            }
+        }
+
         val manager = LinearLayoutManager(context)
         manager.stackFromEnd = true
-        recyclerView.layoutManager = manager
+        binding.chatRecyclerView.layoutManager = manager
         adapter = ChatAdapter({
             TODO("on Emoji Click")
         },{
@@ -69,56 +95,27 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ChatView{
             TODO("on Message Long CLick")
             true
         },{
-            println("debug: Threshold Passed() position=$it")
-        })
-
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                println("debug: scroll: ${recyclerView.canScrollVertically(-1)}")
-
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+            if(!store.currentState.isFullyLoaded){
+                store.accept(ChatEvent.Ui.LoadNextPage(narrows))
             }
         })
-
-        recyclerView.adapter = adapter
+        binding.chatRecyclerView.adapter = adapter
 
         setResultListener()
-
-        presenter = ChatPresenterImpl(this)
-        presenter.attachView(this)
-        presenter.viewIsReady(
-            arguments?.getString(ARG_STREAM_KEY),
-            arguments?.getString(ARG_TOPIC_KEY)
-        )
+        store.accept(ChatEvent.Ui.LoadFirstPage(narrows))
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.detachView()
-    }
-
-    // ChatView
-    override fun addMessages(messages: List<ChatItem>) {
-        adapter.addMessages(messages)
-    }
-
-    override fun setMessages(messages: List<ChatItem>) {
-        adapter.setMessages(messages)
-    }
-
-    override fun showEmptyMessageNotice(noticeRes: Int) {
-        Toast.makeText(context, getString(noticeRes), Toast.LENGTH_SHORT).show()
+        _binding = null
     }
 
     private fun setResultListener(){
         childFragmentManager.setFragmentResultListener("reaction_selection", this){ key, bundle ->
             if(key == "reaction_selection"){
                 val result = bundle.getParcelable<EmojiItem>("emoji")
-                TODO("add selected reaction")
+                println("debug: Fragment ${result?.emojiCode} selected")
+                TODO("add reaction")
 //                if(result != null) addReaction(selectedMessageId, result)
             }
         }
@@ -127,5 +124,31 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ChatView{
     private fun showDialog(){
         val reactionDialog = ReactionBottomDialog()
         reactionDialog.show(childFragmentManager, ReactionBottomDialog.TAG)
+    }
+
+    // ELM
+    override val initEvent: ChatEvent
+        get() = ChatEvent.Ui.Init
+
+    override fun createStore(): Store<ChatEvent, ChatEffect, ChatState> {
+        return DaggerChatComponent.factory()
+            .create((requireActivity() as MainActivity).activityComponent).chatStore
+    }
+
+    override fun render(state: ChatState) {
+        println("debug: ChatFragment: render() oldSize=${adapter.itemCount} addSize=${state.newMessages.size}")
+        adapter.addMessages(state.newMessages)
+    }
+
+    override fun handleEffect(effect: ChatEffect) = when(effect){
+        is ChatEffect.FullyLoaded -> {
+            Toast.makeText(requireContext(), "Вы достигли конца беседы", Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.ShowLoadingError -> {
+            Toast.makeText(requireContext(), "Ошибка при загрузке", Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.EmptyMessage -> {
+            Toast.makeText(requireContext(), "Пустое сообщение", Toast.LENGTH_SHORT).show()
+        }
     }
 }

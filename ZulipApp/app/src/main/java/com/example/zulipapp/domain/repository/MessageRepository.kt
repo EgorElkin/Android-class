@@ -6,9 +6,7 @@ import io.reactivex.Single
 
 interface MessageRepository {
 
-    fun sendMessage(type: String, streamId: Int, topicName: String, content: String): Single<Int>
-
-    fun sendMessage(type: String, streamName: String, topicName: String, content: String): Single<Int>
+    fun sendMessage(type: String, streamName: String, topicName: String?, content: String): Single<Int>
 
     fun fetchMessagesRange(anchor: Int, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>>
 

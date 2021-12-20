@@ -8,7 +8,7 @@ class MessageSendResponse(
     @SerializedName("msg")
     val message: String,
     @SerializedName("id")
-    val id: Int,
+    val id: Int = 0,
     @SerializedName("code")
     val code: String = ""
 )

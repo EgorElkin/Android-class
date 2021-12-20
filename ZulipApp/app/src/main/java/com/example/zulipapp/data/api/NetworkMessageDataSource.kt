@@ -8,11 +8,7 @@ import io.reactivex.Single
 
 class NetworkMessageDataSource(private val messageApiService: MessageApiService) {
 
-    fun sendMessage(type: String, streamId: Int, topicName: String, content: String): Single<MessageSendResponse>{
-        return messageApiService.postMessage(type, streamId, topicName, content)
-    }
-
-    fun sendMessage(type: String, streamName: String, topicName: String, content: String): Single<MessageSendResponse>{
+    fun sendMessage(type: String, streamName: String, topicName: String?, content: String): Single<MessageSendResponse>{
         return messageApiService.postMessage(type, streamName, topicName, content)
     }
 

@@ -13,6 +13,6 @@ sealed class PeopleEvent {
     sealed class Internal : PeopleEvent() {
         class PeopleLoadingSuccess(val users: List<UserItem>) : Internal()
         class PeopleSearchingSuccess(val users: List<UserItem>) : Internal()
-        class LoadingError(val error: Throwable) : Internal()
+        object LoadingError : Internal()
     }
 }

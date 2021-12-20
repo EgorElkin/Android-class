@@ -8,7 +8,7 @@ class PeopleReducer :
         PeopleEvent.Internal::class
 ) {
 
-    override fun Result.internal(event: PeopleEvent.Internal): Any? = when(event) {
+    override fun Result.internal(event: PeopleEvent.Internal) = when(event) {
         is PeopleEvent.Internal.PeopleLoadingSuccess -> {
             if(event.users.isEmpty()){
                 state{ copy(isLoading = false, allUsers = event.users, emptyList = true, emptySearchResult = false) }
@@ -29,7 +29,7 @@ class PeopleReducer :
         }
     }
 
-    override fun Result.ui(event: PeopleEvent.Ui): Any = when(event) {
+    override fun Result.ui(event: PeopleEvent.Ui) = when(event) {
         is PeopleEvent.Ui.Init -> {
             state {
                 copy(
@@ -47,7 +47,7 @@ class PeopleReducer :
                 state { copy(isLoading = true, searchedUsers = emptyList()) }
                 commands { +PeopleCommand.SearchPeople(state.allUsers!!, event.searchQuery) }
             } else {
-
+                state { copy() }
             }
         }
         is PeopleEvent.Ui.UserSelected -> {

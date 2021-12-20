@@ -1,15 +1,17 @@
 package com.example.zulipapp.di
 
-import com.example.zulipapp.presentation.channels.ChannelsPresenter
-import com.example.zulipapp.presentation.channels.ChannelsPresenterImpl
+import com.example.zulipapp.presentation.channels.elm.ChannelsCommand
+import com.example.zulipapp.presentation.channels.elm.ChannelsEffect
+import com.example.zulipapp.presentation.channels.elm.ChannelsEvent
+import com.example.zulipapp.presentation.channels.elm.ChannelsState
 import dagger.Component
+import vivid.money.elmslie.core.ElmStoreCompat
 
 @FragmentScope
 @Component(dependencies = [ActivityComponent::class], modules = [ChannelsModule::class])
 interface ChannelsComponent {
 
-    fun inject(channelsPresenter: ChannelsPresenter)
-//    fun inject(channelsPresenter: ChannelsPresenterImpl)
+    val channelsStore: ElmStoreCompat<ChannelsEvent, ChannelsState, ChannelsEffect, ChannelsCommand>
 
     @Component.Factory
     interface Factory{

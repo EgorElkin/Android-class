@@ -17,6 +17,7 @@
     <string name="incoming_message_image_view_description">Avatar</string>
     <string name="profile_loading_error">Не удалось загрузить пользователя</string>
     <string name="people_loading_error">Произошла ошибка при загрузке</string>
+    <string name="channels_loading_error">Произошла ошибка при загрузке</string>
     <string name="profile_toolbar_title">Profile</string>
     <string name="chat_toolbar_title">#%1$s</string>
     <string name="chat_empty_message_notice">Пустое сообщение</string>

@@ -127,7 +127,8 @@ class MainActivity : AppCompatActivity() , Navigator{
     override fun showChat(streamName: String, topicName: String?) {
         println("debug: showChat() streamName=$streamName topicName=$topicName")
         supportFragmentManager.beginTransaction()
-            .add(R.id.mainFragmentContainer, ChatFragment.newInstance(streamName, topicName))
+            .replace(R.id.mainFragmentContainer, ChatFragment.newInstance(streamName, topicName))
+            .addToBackStack(null)
             .commitAllowingStateLoss()
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.green_common)

@@ -2,9 +2,10 @@ package com.example.zulipapp.di
 
 import com.example.zulipapp.domain.repository.StreamRepository
 import com.example.zulipapp.domain.usecase.*
+import com.example.zulipapp.presentation.channels.elm.*
 import dagger.Module
 import dagger.Provides
-import javax.inject.Qualifier
+import vivid.money.elmslie.core.ElmStoreCompat
 
 @Module
 class ChannelsModule {
@@ -21,21 +22,51 @@ class ChannelsModule {
     @FragmentScope
     fun provideGetTopicsUseCase(streamRepository: StreamRepository): GetTopicsUseCase = GetTopicsUseCaseImpl(streamRepository)
 
-    @Provides
-    @SearchAllQualifier
-    @FragmentScope
-    fun provideSearchAllStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchAllStreamUseCaseImpl(streamRepository)
+//    @Provides
+//    @SearchAllQualifier
+//    @FragmentScope
+//    fun provideSearchAllStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchAllStreamUseCaseImpl(streamRepository)
+//
+//    @Provides
+//    @SearchSubscribedQualifier
+//    @FragmentScope
+//    fun provideSearchSubscribedStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchSubscribedStreamUseCaseImpl(streamRepository)
 
     @Provides
-    @SearchSubscribedQualifier
     @FragmentScope
-    fun provideSearchSubscribedStreamUseCase(streamRepository: StreamRepository): SearchStreamUseCase = SearchSubscribedStreamUseCaseImpl(streamRepository)
+    fun provideChannelsState(): ChannelsState {
+        return ChannelsState()
+    }
 
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class SearchAllQualifier
+    @Provides
+    @FragmentScope
+    fun provideChannelsActor(getSubscribedStreamsUseCase: GetSubscribedStreamsUseCase, getAllStreamsUseCase: GetAllStreamsUseCase, getTopicsUseCase: GetTopicsUseCase): ChannelsActor {
+        return ChannelsActor(getSubscribedStreamsUseCase, getAllStreamsUseCase, getTopicsUseCase)
+    }
 
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class SearchSubscribedQualifier
+    @Provides
+    @FragmentScope
+    fun provideChannelsReducer(): ChannelsReducer {
+        return ChannelsReducer()
+    }
+
+    @Provides
+    @FragmentScope
+    fun provideChannelsStoreFactory(
+        channelsState: ChannelsState,
+        channelsReducer: ChannelsReducer,
+        channelsActor: ChannelsActor
+    ): ElmStoreCompat<ChannelsEvent, ChannelsState, ChannelsEffect, ChannelsCommand> = ElmStoreCompat(
+        initialState = channelsState,
+        reducer = channelsReducer,
+        actor = channelsActor
+    )
+
+//    @Qualifier
+//    @Retention(AnnotationRetention.RUNTIME)
+//    annotation class SearchAllQualifier
+//
+//    @Qualifier
+//    @Retention(AnnotationRetention.RUNTIME)
+//    annotation class SearchSubscribedQualifier
 }

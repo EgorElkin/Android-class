@@ -2,27 +2,28 @@ package com.example.zulipapp.presentation.channels
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
+import androidx.core.widget.doOnTextChanged
 import androidx.viewpager2.widget.ViewPager2
 import com.example.zulipapp.R
+import com.example.zulipapp.databinding.FragmentChannelsBinding
+import com.example.zulipapp.di.DaggerChannelsComponent
 import com.example.zulipapp.presentation.Navigator
 import com.example.zulipapp.presentation.channels.adapter.ChannelsAdapter
-import com.example.zulipapp.presentation.channels.adapter.ChannelsItem
-import com.google.android.material.tabs.TabLayout
+import com.example.zulipapp.presentation.channels.elm.ChannelsEffect
+import com.example.zulipapp.presentation.channels.elm.ChannelsEvent
+import com.example.zulipapp.presentation.channels.elm.ChannelsState
+import com.example.zulipapp.presentation.main.MainActivity
 import com.google.android.material.tabs.TabLayoutMediator
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
 
-class ChannelsFragment : Fragment(R.layout.fragment_channels), ChannelsView {
+class ChannelsFragment : ElmFragment<ChannelsEvent, ChannelsEffect, ChannelsState>(R.layout.fragment_channels) {
 
-    private lateinit var presenter: ChannelsPresenterImpl
-
-    private lateinit var editText: EditText
-    private lateinit var searchButton: ImageButton
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
+    private var _binding: FragmentChannelsBinding? = null
+    private val binding: FragmentChannelsBinding
+        get() = _binding!!
 
     private lateinit var viewPagerAdapter: ChannelsViewPagerAdapter
     private lateinit var channelsSubscribedAdapter: ChannelsAdapter
@@ -30,94 +31,117 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), ChannelsView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+println("debug: Fragment: onViewCreated()")
+        _binding = FragmentChannelsBinding.bind(view)
 
-        editText = view.findViewById(R.id.channelsSearchEditText)
-        editText.doAfterTextChanged {
-            presenter.searchRequestChanged(it.toString())
+        binding.channelsSearchEditText.doAfterTextChanged {
+            store.accept(ChannelsEvent.Ui.SearchQueryChanged(it.toString()))
         }
 
-        searchButton = view.findViewById(R.id.channelsSearchButton)
-        searchButton.setOnClickListener {
-            presenter.searchButtonClicked(editText.text.toString())
+        binding.channelsSearchButton.setOnClickListener {
+            store.accept(ChannelsEvent.Ui.SearchButtonClicked(binding.channelsSearchEditText.text.toString()))
         }
-
-        tabLayout = view.findViewById(R.id.channelsTabLayout)
-        viewPager = view.findViewById(R.id.channelsViewPager)
 
         channelsSubscribedAdapter = ChannelsAdapter({
-            println("debug: StreamSelected: ${it.name}")
-            presenter.streamSelected(it.name)
+            store.accept(ChannelsEvent.Ui.StreamSelected(it))
         },{
-            println("debug: TopicSelected: ${it.streamName}: ${it.name}")
-            presenter.topicSelected(it.streamName, it.name)
+            store.accept(ChannelsEvent.Ui.TopicSelected(it.streamName, it))
         })
         channelsAllAdapter = ChannelsAdapter({
-            println("debug: StreamSelected: ${it.name}")
-            presenter.streamSelected(it.name)
+            store.accept(ChannelsEvent.Ui.StreamSelected(it))
         },{
-            println("debug: TopicSelected: ${it.streamName}: ${it.name}")
-            presenter.topicSelected(it.streamName, it.name)
+            store.accept(ChannelsEvent.Ui.TopicSelected(it.streamName, it))
         })
         viewPagerAdapter = ChannelsViewPagerAdapter(channelsSubscribedAdapter, channelsAllAdapter)
-        viewPager.adapter = viewPagerAdapter
+        binding.channelsViewPager.adapter = viewPagerAdapter
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+        binding.channelsViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
-                when(position){
-                    ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
-                        presenter.subscribedStreamsListSelected(editText.text.toString())
-                    }
-                    ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
-                        presenter.allStreamsListSelected(editText.text.toString())
-                    }
-                }
+                store.accept(ChannelsEvent.Ui.TabChanged(position, binding.channelsSearchEditText.text.toString()))
             }
         })
 
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        TabLayoutMediator(binding.channelsTabLayout, binding.channelsViewPager) { tab, position ->
             tab.text = when (position) {
                 ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> resources.getString(R.string.channels_tab_subscribed)
                 ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> resources.getString(R.string.channels_tab_all)
                 else -> throw IllegalArgumentException("TabLayoutMediator.TabConfigurationStrategy: such a position does not exist")
             }
         }.attach()
-
-        presenter = ChannelsPresenterImpl(this, (this.activity as Navigator))
-        presenter.attachView(this)
-        presenter.viewIsReady()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        presenter.detachView()
+        _binding = null
     }
 
-    // ChannelsView
-    override fun showAllStreams(streams: List<ChannelsItem>) {
-        viewPagerAdapter.setAllStreams(streams)
+    // ELM
+    override val initEvent: ChannelsEvent
+        get() = ChannelsEvent.Ui.Init
+
+    override fun createStore(): Store<ChannelsEvent, ChannelsEffect, ChannelsState> {
+        return DaggerChannelsComponent.factory()
+            .create((requireActivity() as MainActivity).activityComponent).channelsStore
     }
 
-    override fun showSubscribedStreams(streams: List<ChannelsItem>) {
-        viewPagerAdapter.setSubscribedStreams(streams)
+    override fun render(state: ChannelsState) {
+        println("debug: Fragment: render()")
+        when(binding.channelsTabLayout.selectedTabPosition){
+            ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
+                println("debug: Fragment Tab=${binding.channelsTabLayout.selectedTabPosition}")
+                if(state.isNewSubscribed && state.searchedSubscribedStreams != null) {
+                    println("debug: Fragment: Subs!=null size=${state.searchedSubscribedStreams.size}")
+                    viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
+                }
+            }
+            ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
+                println("debug: Fragment Tab=${binding.channelsTabLayout.selectedTabPosition}")
+                if(state.isAllLoading){
+
+                    TODO("Loading")
+                } else if( viewPagerAdapter.allSize() == 0 && state.searchedAllStreams != null){
+                    println("debug: Fragment: All Size = 0")
+                    viewPagerAdapter.setAllStreams(state.searchedAllStreams)
+                } else if(state.isNewAll && state.searchedAllStreams != null) {
+                    println("debug: Fragment: All!=null size=${state.searchedAllStreams.size}")
+                    viewPagerAdapter.setAllStreams(state.searchedAllStreams)
+                }
+            }
+        }
+
+        // renderLoadingAll
+        // renderLoadingSUbs
+
+//        if(state.searchedSubscribedStreams != null){
+//            println("debug: Fragment: Subs!=null")
+//            if(viewPagerAdapter.subscribedSize() == 0){
+//                viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
+//            } else {
+//
+//            }
+//        } else {
+//             TODO("не найдено")
+//        }
+
+//        if(viewPagerAdapter.subscribedSize() == 0 && state.searchedSubscribedStreams != null) {
+//            println("debug: Fragment: Subs!=null")
+//            viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
+//        }
+//        if(viewPagerAdapter.allSize() == 0 && state.searchedAllStreams != null){
+//            println("debug: Fragment: All!=null")
+//            viewPagerAdapter.setAllStreams((state.searchedAllStreams))
+//        }
     }
 
-    override fun showAllLoading() {
-        TODO("Not yet implemented")
-    }
-
-    override fun hideAllLoading() {
-        TODO("Not yet implemented")
-    }
-
-    override fun showSubscribedLoading() {
-        TODO("Not yet implemented")
-    }
-
-    override fun hideSubscribedLoading() {
-        TODO("Not yet implemented")
-    }
-
-    override fun showError(message: Int) {
-        Toast.makeText(context, getString(message), Toast.LENGTH_SHORT).show()
+    override fun handleEffect(effect: ChannelsEffect) = when(effect){
+        is ChannelsEffect.ShowLoadingError -> {
+            Toast.makeText(context, getString(R.string.channels_loading_error), Toast.LENGTH_SHORT).show()
+        }
+        is ChannelsEffect.NavigateToStream -> {
+            (requireActivity() as Navigator).showChat(effect.stream.name, null)
+        }
+        is ChannelsEffect.NavigateToTopic -> {
+            (requireActivity() as Navigator).showChat(effect.topic.streamName, effect.topic.name)
+        }
     }
 }

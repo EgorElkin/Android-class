@@ -13,12 +13,8 @@ class MessageRepositoryImpl(
 //    private val localDataSource: LocalMessageDataSource
 ) : MessageRepository {
 
-    override fun sendMessage(type: String, streamId: Int, topicName: String, content: String): Single<Int> {
-        TODO("Not yet implemented")
-    }
-
-    override fun sendMessage(type: String, streamName: String, topicName: String, content: String): Single<Int> {
-        TODO("Not yet implemented")
+    override fun sendMessage(type: String, streamName: String, topicName: String?, content: String): Single<Int> {
+        return networkDataSource.sendMessage(type, streamName, topicName, content).map { it.id }
     }
 
     override fun fetchMessagesRange(anchor: Int, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>> {
@@ -26,7 +22,6 @@ class MessageRepositoryImpl(
     }
 
     override fun fetchMessagesRange(anchor: String, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>> {
-        println("debug: fetchMessagesRange()")
         return networkDataSource.fetchMessagesRange(anchor, numBefore, numAfter, narrows).map(ResponseToMessageMapper())
     }
 

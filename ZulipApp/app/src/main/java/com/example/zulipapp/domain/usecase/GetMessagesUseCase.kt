@@ -5,7 +5,7 @@ import com.example.zulipapp.domain.entity.Message
 import com.example.zulipapp.domain.repository.MessageRepository
 import io.reactivex.Single
 
-interface GetMessagesUseCase{// : (String, Int, Int, List<Narrow>) -> Single<List<Message>>{
+interface GetMessagesUseCase{
 
     fun getMessages(anchor: String, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>>
 
@@ -13,10 +13,6 @@ interface GetMessagesUseCase{// : (String, Int, Int, List<Narrow>) -> Single<Lis
 }
 
 class GetMessagesUseCaseImpl(private val messageRepository: MessageRepository) : GetMessagesUseCase{
-
-//    override fun invoke(anchor: String, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>> {
-//        return messageRepository.fetchMessagesRange(anchor, numBefore, numAfter, narrows)
-//    }
 
     override fun getMessages(anchor: String, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>> {
         return messageRepository.fetchMessagesRange(anchor, numBefore, numAfter, narrows)

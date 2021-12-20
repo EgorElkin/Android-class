@@ -9,6 +9,7 @@ import com.example.zulipapp.presentation.profile.elm.*
 import dagger.Module
 import dagger.Provides
 import vivid.money.elmslie.core.ElmStoreCompat
+import javax.inject.Singleton
 
 @Module
 class ProfileModule {

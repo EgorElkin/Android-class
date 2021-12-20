@@ -3,6 +3,8 @@ package com.example.zulipapp.presentation.channels
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zulipapp.R
 import com.example.zulipapp.presentation.channels.adapter.ChannelsAdapter
@@ -18,7 +20,8 @@ class ChannelsViewPagerAdapter(
 
     class PageViewHolder(itemView: View, private val adapter: ChannelsAdapter) : RecyclerView.ViewHolder(itemView){
 
-        val recyclerView: RecyclerView = itemView.findViewById(R.id.channelsViewPagerRecyclerView)
+        private val recyclerView: RecyclerView = itemView.findViewById(R.id.channelsViewPagerRecyclerView)
+        private val progressBar: ProgressBar = itemView.findViewById(R.id.channelsProgressBar)
 
         init {
             recyclerView.adapter = adapter
@@ -26,6 +29,10 @@ class ChannelsViewPagerAdapter(
 
         fun bind(list: List<ChannelsItem>){
             adapter.submitList(list)
+        }
+
+        fun showLoading(loading: Boolean){
+            progressBar.isVisible = loading
         }
     }
 
@@ -63,6 +70,18 @@ class ChannelsViewPagerAdapter(
         allChannels.clear()
         allChannels.addAll(newList)
         notifyItemChanged(ALL_STREAMS_FRAGMENT_POSITION)
+    }
+
+    fun subscribedSize() = subscribedChannels.size
+
+    fun allSize() = allChannels.size
+
+    fun showSubscribedLoading(loading: Boolean){
+
+    }
+
+    fun showAllLoading(loading: Boolean){
+
     }
 
     companion object{

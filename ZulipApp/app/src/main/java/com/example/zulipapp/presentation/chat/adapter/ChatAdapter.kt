@@ -5,14 +5,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zulipapp.R
-import java.lang.IllegalArgumentException
 
 class ChatAdapter(
     private val onEmojiClickListener: View.OnClickListener,
     private val onPlusClickListener: View.OnClickListener,
     private val onLongClickListener: (item: ChatItem, position: Int) -> Unit,
-private val thresholdPassed: (Int) -> Unit
+    private val thresholdPassed: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object{
+        const val PAGING_THRESHOLD = 5
+    }
 
     private val messagesList: MutableList<ChatItem> = mutableListOf()
 
@@ -41,7 +44,7 @@ private val thresholdPassed: (Int) -> Unit
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if(position == 5){
+        if(position == PAGING_THRESHOLD){
             thresholdPassed(position)
         }
         when(getItemViewType(position)){
@@ -65,16 +68,10 @@ private val thresholdPassed: (Int) -> Unit
     }
 
     fun addMessages(messages: List<ChatItem>){
-        val positionStart = messagesList.size
-        messagesList.addAll(messages)
-        notifyItemRangeInserted(positionStart, messages.size)
-    }
-
-    fun setMessages(newList: List<ChatItem>){
+        val newList = messages + messagesList
         messagesList.clear()
         messagesList.addAll(newList)
-//        notifyDataSetChanged()
-        notifyItemRangeInserted(0, messagesList.size)
+        notifyItemRangeInserted(0, messages.size)
     }
 
     fun addReactionOnMessageAtIndex(reactionItem: ReactionItem, index: Int){

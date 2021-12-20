@@ -3,8 +3,6 @@ package com.example.zulipapp.di
 import com.example.zulipapp.domain.repository.UserRepository
 import com.example.zulipapp.domain.usecase.GetPeopleUseCase
 import com.example.zulipapp.domain.usecase.GetPeopleUseCaseImpl
-import com.example.zulipapp.domain.usecase.SearchUserUseCase
-import com.example.zulipapp.domain.usecase.SearchUserUseCaseImpl
 import com.example.zulipapp.presentation.people.elm.*
 import dagger.Module
 import dagger.Provides
@@ -12,10 +10,6 @@ import vivid.money.elmslie.core.ElmStoreCompat
 
 @Module
 class PeopleModule {
-
-    @Provides
-    @FragmentScope
-    fun provideSearchUserUseCase(userRepository: UserRepository): SearchUserUseCase = SearchUserUseCaseImpl(userRepository)
 
     @Provides
     @FragmentScope
