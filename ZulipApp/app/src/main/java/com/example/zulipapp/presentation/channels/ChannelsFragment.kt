@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.viewpager2.widget.ViewPager2
 import com.example.zulipapp.R
 import com.example.zulipapp.databinding.FragmentChannelsBinding
@@ -35,11 +34,11 @@ class ChannelsFragment : ElmFragment<ChannelsEvent, ChannelsEffect, ChannelsStat
         _binding = FragmentChannelsBinding.bind(view)
 
         binding.channelsSearchEditText.doAfterTextChanged {
-            store.accept(ChannelsEvent.Ui.SearchQueryChanged(it.toString()))
+            store.accept(ChannelsEvent.Ui.SearchQueryChanged(binding.channelsViewPager.currentItem, it.toString()))
         }
 
         binding.channelsSearchButton.setOnClickListener {
-            store.accept(ChannelsEvent.Ui.SearchButtonClicked(binding.channelsSearchEditText.text.toString()))
+            store.accept(ChannelsEvent.Ui.SearchButtonClicked(binding.channelsViewPager.currentItem, binding.channelsSearchEditText.text.toString()))
         }
 
         channelsSubscribedAdapter = ChannelsAdapter({
@@ -87,52 +86,18 @@ class ChannelsFragment : ElmFragment<ChannelsEvent, ChannelsEffect, ChannelsStat
     }
 
     override fun render(state: ChannelsState) {
-        println("debug: Fragment: render()")
         when(binding.channelsTabLayout.selectedTabPosition){
             ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
-                println("debug: Fragment Tab=${binding.channelsTabLayout.selectedTabPosition}")
-                if(state.isNewSubscribed && state.searchedSubscribedStreams != null) {
-                    println("debug: Fragment: Subs!=null size=${state.searchedSubscribedStreams.size}")
+                if(state.searchedSubscribedStreams != null) {
                     viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
                 }
             }
             ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
-                println("debug: Fragment Tab=${binding.channelsTabLayout.selectedTabPosition}")
-                if(state.isAllLoading){
-
-                    TODO("Loading")
-                } else if( viewPagerAdapter.allSize() == 0 && state.searchedAllStreams != null){
-                    println("debug: Fragment: All Size = 0")
-                    viewPagerAdapter.setAllStreams(state.searchedAllStreams)
-                } else if(state.isNewAll && state.searchedAllStreams != null) {
-                    println("debug: Fragment: All!=null size=${state.searchedAllStreams.size}")
+                    if(state.searchedAllStreams != null) {
                     viewPagerAdapter.setAllStreams(state.searchedAllStreams)
                 }
             }
         }
-
-        // renderLoadingAll
-        // renderLoadingSUbs
-
-//        if(state.searchedSubscribedStreams != null){
-//            println("debug: Fragment: Subs!=null")
-//            if(viewPagerAdapter.subscribedSize() == 0){
-//                viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
-//            } else {
-//
-//            }
-//        } else {
-//             TODO("не найдено")
-//        }
-
-//        if(viewPagerAdapter.subscribedSize() == 0 && state.searchedSubscribedStreams != null) {
-//            println("debug: Fragment: Subs!=null")
-//            viewPagerAdapter.setSubscribedStreams(state.searchedSubscribedStreams)
-//        }
-//        if(viewPagerAdapter.allSize() == 0 && state.searchedAllStreams != null){
-//            println("debug: Fragment: All!=null")
-//            viewPagerAdapter.setAllStreams((state.searchedAllStreams))
-//        }
     }
 
     override fun handleEffect(effect: ChannelsEffect) = when(effect){

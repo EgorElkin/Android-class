@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() , Navigator{
     override fun onBackPressed() {
         super.onBackPressed()
         supportActionBar?.hide()
+        window.statusBarColor = ContextCompat.getColor(this, R.color.background_gray_dark)
         navigation.visibility = View.VISIBLE
     }
 

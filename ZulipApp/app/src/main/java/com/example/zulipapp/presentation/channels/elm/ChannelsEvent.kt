@@ -6,8 +6,8 @@ sealed class ChannelsEvent {
 
     sealed class Ui : ChannelsEvent(){
         object Init : Ui()
-        class SearchQueryChanged(val searchQuery: String) : Ui()
-        class SearchButtonClicked(val searchQuery: String) : Ui()
+        class SearchQueryChanged(val position: Int, val searchQuery: String) : Ui()
+        class SearchButtonClicked(val position: Int, val searchQuery: String) : Ui()
         class TabChanged(val newPosition: Int, val searchQuery: String) : Ui()
         class TopicSelected(val streamName: String, val topic: ChannelsItem.TopicItem) : Ui()
         class StreamSelected(val stream: ChannelsItem.StreamItem) : Ui()

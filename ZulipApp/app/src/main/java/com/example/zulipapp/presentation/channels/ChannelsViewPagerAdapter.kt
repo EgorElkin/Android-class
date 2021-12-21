@@ -72,18 +72,6 @@ class ChannelsViewPagerAdapter(
         notifyItemChanged(ALL_STREAMS_FRAGMENT_POSITION)
     }
 
-    fun subscribedSize() = subscribedChannels.size
-
-    fun allSize() = allChannels.size
-
-    fun showSubscribedLoading(loading: Boolean){
-
-    }
-
-    fun showAllLoading(loading: Boolean){
-
-    }
-
     companion object{
         const val ITEMS_COUNT = 2
         const val SUBSCRIBED_FRAGMENT_POSITION = 0
