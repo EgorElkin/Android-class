@@ -3,15 +3,12 @@ package com.example.zulipapp.data.repository
 import com.example.zulipapp.data.api.NetworkMessageDataSource
 import com.example.zulipapp.data.api.entity.message.Narrow
 import com.example.zulipapp.data.api.mapper.ResponseToMessageMapper
-import com.example.zulipapp.data.database.LocalMessageDataSource
 import com.example.zulipapp.domain.entity.Message
 import com.example.zulipapp.domain.repository.MessageRepository
-import io.reactivex.Completable
 import io.reactivex.Single
 
 class MessageRepositoryImpl(
     private val networkDataSource: NetworkMessageDataSource,
-//    private val localDataSource: LocalMessageDataSource
 ) : MessageRepository {
 
     override fun sendMessage(type: String, streamName: String, topicName: String?, content: String): Single<Int> {

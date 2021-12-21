@@ -19,37 +19,28 @@ class ChannelsReducer :
     private var subscribedSearchQuery: String = ""
     private var allSearchQuery: String = ""
 
-    private val subscribedSubject: PublishSubject<String> = PublishSubject.create()
-    private val allSubject: PublishSubject<String> = PublishSubject.create()
-
     override fun Result.internal(event: ChannelsEvent.Internal) = when (event) {
         is ChannelsEvent.Internal.SubscribedLoadingSuccess -> {
-            println("debug: Reducer: Internal.subscribedSuccess")
             subscribedStreams = event.streams
             state { copy(isSubscribedLoading = false, searchedSubscribedStreams = event.streams, isNewSubscribed = true, isNewAll = false) }
         }
         is ChannelsEvent.Internal.SubscribedSearchingSuccess -> {
-            println("debug: Reducer: Internal.subscribedSearch")
             searchedSubscribedStreams = event.streams
             state { copy(isSubscribedLoading = false, searchedSubscribedStreams = event.streams, isNewSubscribed = true, isNewAll = false) }
         }
         is ChannelsEvent.Internal.SubscribedLoadingError -> {
-            println("debug: Reducer: Internal.subscribedError")
             state { copy(isSubscribedLoading = false) }
             effects { +ChannelsEffect.ShowLoadingError }
         }
         is ChannelsEvent.Internal.AllLoadingSuccess -> {
-            println("debug: Reducer: Internal.allSuccess")
             allStreams = event.streams
             state { copy(isAllLoading = false, searchedAllStreams = event.streams, isNewSubscribed = false, isNewAll = true) }
         }
         is ChannelsEvent.Internal.AllSearchingSuccess -> {
-            println("debug: Reducer: Internal.allSearch")
             searchedAllStreams = event.streams
             state { copy(isAllLoading = false, searchedAllStreams = event.streams, isNewSubscribed = false, isNewAll = true) }
         }
         is ChannelsEvent.Internal.AllLoadingError -> {
-            println("debug: Reducer: Internal.allError")
             state { copy(isAllLoading = false) }
             effects { +ChannelsEffect.ShowLoadingError }
         }
@@ -57,18 +48,11 @@ class ChannelsReducer :
 
     override fun Result.ui(event: ChannelsEvent.Ui) = when (event) {
         is ChannelsEvent.Ui.Init -> {
-            println("debug: Reducer: Ui.Init()")
             state { copy(isSubscribedLoading = true, isAllLoading = true, isNewSubscribed = false, isNewAll = false) }
-            if(subscribedStreams == null)
-                commands { +ChannelsCommand.LoadSubscribedStreams }
-            if(allStreams == null){
-                commands { +ChannelsCommand.LoadAllStreams }
-            } else {
-
-            }
+            commands { +ChannelsCommand.LoadSubscribedStreams }
+            commands { +ChannelsCommand.LoadAllStreams }
         }
         is ChannelsEvent.Ui.SearchButtonClicked -> {
-            println("debug: Reducer: Ui.Button()")
             when(state.currentTab){
                 ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
                     if (!state.isSubscribedLoading && subscribedStreams != null){
@@ -94,7 +78,6 @@ class ChannelsReducer :
             }
         }
         is ChannelsEvent.Ui.SearchQueryChanged -> {
-            println("debug: Reducer: Ui.EditText()")
             when(state.currentTab){
                 ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
                     if (!state.isSubscribedLoading && subscribedStreams != null){
@@ -120,9 +103,6 @@ class ChannelsReducer :
             }
         }
         is ChannelsEvent.Ui.TabChanged -> {
-//            if(event.searchQuery != state.currentSearchQuery)
-
-//            println("debug: Reducer: Ui.TabChanged()")
             when(event.newPosition){
                 ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
                     if(!state.isSubscribedLoading){
@@ -132,11 +112,9 @@ class ChannelsReducer :
                             state { copy(isSubscribedLoading = true, searchedSubscribedStreams = emptyList(), isNewSubscribed = false, isNewAll = false) }
                             commands { +ChannelsCommand.SearchSubscribedStreams(subscribedStreams!!, event.searchQuery) }
                         } else {
-                            println("debug: Reducer: Ui.TabChanged() SUB: IF ELSE")
                             state{ copy(isNewSubscribed = false, isNewAll = false) }
                         }
                     } else {
-                        println("debug: Reducer: Ui.TabChanged() SUB: ELSE")
                     }
 //                    if (event.searchQuery != subscribedSearchQuery && !state.isSubscribedLoading && subscribedStreams != null){
 //                        println("debug: Reducer: Ui.TabChanged() IF")

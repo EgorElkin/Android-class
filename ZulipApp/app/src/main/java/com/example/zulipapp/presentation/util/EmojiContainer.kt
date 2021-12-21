@@ -5,7 +5,7 @@ import android.content.Context
 class EmojiContainer {
     companion object{
 
-        const val EMOJI_FILE_NAME = "emojis.txt"
+        private const val EMOJI_FILE_NAME = "emojis.txt"
 
         fun getEmojisMap(context: Context): LinkedHashMap<String, String>{
             val map = LinkedHashMap<String, String>()

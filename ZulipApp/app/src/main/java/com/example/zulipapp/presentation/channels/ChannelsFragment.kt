@@ -31,7 +31,7 @@ class ChannelsFragment : ElmFragment<ChannelsEvent, ChannelsEffect, ChannelsStat
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-println("debug: Fragment: onViewCreated()")
+
         _binding = FragmentChannelsBinding.bind(view)
 
         binding.channelsSearchEditText.doAfterTextChanged {
@@ -47,11 +47,13 @@ println("debug: Fragment: onViewCreated()")
         },{
             store.accept(ChannelsEvent.Ui.TopicSelected(it.streamName, it))
         })
+
         channelsAllAdapter = ChannelsAdapter({
             store.accept(ChannelsEvent.Ui.StreamSelected(it))
         },{
             store.accept(ChannelsEvent.Ui.TopicSelected(it.streamName, it))
         })
+
         viewPagerAdapter = ChannelsViewPagerAdapter(channelsSubscribedAdapter, channelsAllAdapter)
         binding.channelsViewPager.adapter = viewPagerAdapter
 

@@ -15,17 +15,14 @@ class ChannelsActor(
 ) : ActorCompat<ChannelsCommand, ChannelsEvent> {
 
     override fun execute(command: ChannelsCommand): Observable<ChannelsEvent> {
-        println("debug: ChannelsActor: execute()")
         when (command) {
             is ChannelsCommand.LoadSubscribedStreams -> {
-                println("debug: ChannelsActor: loadSubscribed")
                 return getSubscribedStreamsUseCase()
                     .map(StreamToItemMapper())
                     .flatMap { streams ->
                         Observable.fromIterable(streams)
                     }
                     .flatMap({ stream ->
-//                        println("debug: stream -> topics: ${stream.name}")
                         getTopicsUseCase(stream.id).map(TopicToItemMapper())
                     }, { stream, topics ->
                         topics.map { it.streamName = stream.name }
@@ -33,20 +30,11 @@ class ChannelsActor(
                         stream
                     })
                     .toList()
-                    .map {
-                        ChannelsEvent.Internal.SubscribedLoadingSuccess(it) as ChannelsEvent
-                    }
-                    .doOnSuccess {
-                        println("debug: ChannelsActor: SUCCESS Sub: EventSize=${(it as ChannelsEvent.Internal.SubscribedLoadingSuccess).streams.size}")
-                    }
-                    .doOnError {
-                        println("debug: ChannelsActor: SUB Error=$it")
-                        ChannelsEvent.Internal.SubscribedLoadingError(it) as ChannelsEvent
-                    }
+                    .map { ChannelsEvent.Internal.SubscribedLoadingSuccess(it) as ChannelsEvent }
+                    .doOnError { ChannelsEvent.Internal.SubscribedLoadingError(it) }
                     .toObservable()
             }
             is ChannelsCommand.SearchSubscribedStreams -> {
-                println("debug: ChannelsActor: searchSubscribed")
                 val newList = command.streams
                     .filter { stream ->
                         stream.name.contains(command.searchQuery, ignoreCase = true) ||
@@ -57,14 +45,12 @@ class ChannelsActor(
                 return Observable.just(ChannelsEvent.Internal.SubscribedSearchingSuccess(newList))
             }
             is ChannelsCommand.LoadAllStreams -> {
-                println("debug: ChannelsActor: loadAll")
                 return getAllStreamsUseCase()
                     .map(StreamToItemMapper())
                     .flatMap { streams ->
                         Observable.fromIterable(streams)
                     }
                     .flatMap({ stream ->
-//                        println("debug: stream -> topics: ${stream.name}")
                         getTopicsUseCase(stream.id).map(TopicToItemMapper())
                     }, { stream, topics ->
                         topics.map { it.streamName = stream.name }
@@ -72,20 +58,11 @@ class ChannelsActor(
                         stream
                     })
                     .toList()
-                    .map {
-                        ChannelsEvent.Internal.AllLoadingSuccess(it) as ChannelsEvent
-                    }
-                    .doOnSuccess {
-                        println("debug: ChannelsActor: SUCCESS All: EventSize=${(it as ChannelsEvent.Internal.AllLoadingSuccess).streams.size}")
-                    }
-                    .doOnError {
-                        println("debug: ChannelsActor: ALL Error=$it")
-                        ChannelsEvent.Internal.AllLoadingError(it) as ChannelsEvent
-                    }
+                    .map { ChannelsEvent.Internal.AllLoadingSuccess(it) as ChannelsEvent }
+                    .doOnError { ChannelsEvent.Internal.AllLoadingError(it) }
                     .toObservable()
             }
             is ChannelsCommand.SearchAllStreams -> {
-                println("debug: ChannelsActor: searchAll")
                 val newList = command.streams
                     .filter { stream ->
                         stream.name.contains(command.searchQuery, ignoreCase = true) ||

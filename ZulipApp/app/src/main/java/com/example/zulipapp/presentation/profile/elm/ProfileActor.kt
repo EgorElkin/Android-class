@@ -11,16 +11,7 @@ class ProfileActor(
     private val getUserPresenceUseCase: GetUserStatusUseCase
 ) : ActorCompat<ProfileCommand, ProfileEvent> {
 
-    init {
-        println("debug: Actor: INIT")
-    }
-
-    init {
-        println("debug: Actor: useCase1=$getUserUseCase, useCase2=$getUserPresenceUseCase")
-    }
-
     override fun execute(command: ProfileCommand): Observable<ProfileEvent> {
-        println("debug: Actor: execute")
         return when(command){
             is ProfileCommand.LoadProfile -> {
                 getUserUseCase(command.userId)
@@ -32,7 +23,7 @@ class ProfileActor(
                         profile.status = status.status
                         ProfileEvent.Internal.ProfileLoaded(profile) as ProfileEvent
                     }).doOnError {
-                        ProfileEvent.Internal.ErrorLoading(it) as ProfileEvent
+                        ProfileEvent.Internal.ErrorLoading(it)
                     }
             }
         }

@@ -92,11 +92,6 @@ class ReactionView @JvmOverloads constructor(
         currentPaddingBottom = maxOf(defaultVerticalPadding, paddingBottom.toFloat()).toInt()
     }
 
-    fun setTextColor(color: Int){
-        commonPaint.color = color
-        invalidate()
-    }
-
     // Не понятно для чего переопределять этот метод!
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
         val drawableState = super.onCreateDrawableState(extraSpace + SUPPORTED_DRAWABLE_STATE.size)

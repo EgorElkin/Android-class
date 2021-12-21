@@ -8,11 +8,7 @@ class ProfileReducer :
         ProfileEvent.Internal::class
     ) {
 
-    init {
-        println("debug: Reducer: INIT")
-    }
-
-    override fun Result.internal(event: ProfileEvent.Internal): Any? = when (event) {
+    override fun Result.internal(event: ProfileEvent.Internal): Any = when (event) {
         is ProfileEvent.Internal.ProfileLoaded -> {
             state { copy(isLoading = false, profile = event.value) }
         }

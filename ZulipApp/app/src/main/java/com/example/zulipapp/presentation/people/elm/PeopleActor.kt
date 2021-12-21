@@ -20,7 +20,7 @@ class PeopleActor(private val getPeopleUseCase: GetPeopleUseCase) : ActorCompat<
                         PeopleEvent.Internal.PeopleLoadingSuccess(it) as PeopleEvent
                     }
                     .doOnError {
-                        PeopleEvent.Internal.LoadingError as PeopleEvent
+                        PeopleEvent.Internal.LoadingError
                     }
             }
             is PeopleCommand.SearchPeople -> {

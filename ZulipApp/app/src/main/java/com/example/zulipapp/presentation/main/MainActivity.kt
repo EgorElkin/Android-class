@@ -10,11 +10,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.example.zulipapp.App
 import com.example.zulipapp.R
 import com.example.zulipapp.di.ActivityComponent
-import com.example.zulipapp.di.ChannelsComponent
 import com.example.zulipapp.di.DaggerActivityComponent
-import com.example.zulipapp.di.DaggerChannelsComponent
-import com.example.zulipapp.domain.repository.MessageRepository
-import com.example.zulipapp.domain.usecase.GetMessagesUseCase
 import com.example.zulipapp.presentation.Navigator
 import com.example.zulipapp.presentation.channels.ChannelsFragment
 import com.example.zulipapp.presentation.chat.ChatFragment
@@ -22,7 +18,6 @@ import com.example.zulipapp.presentation.people.PeopleFragment
 import com.example.zulipapp.presentation.profile.ProfileFragment
 import com.example.zulipapp.presentation.util.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() , Navigator{
 
@@ -33,7 +28,6 @@ class MainActivity : AppCompatActivity() , Navigator{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         activityComponent = DaggerActivityComponent.factory().create((application as App).appComponent)
-//        activityComponent.inject(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -51,7 +45,6 @@ class MainActivity : AppCompatActivity() , Navigator{
                     true
                 }
                 R.id.menuPeople -> {
-                    println("debug: menuPeople selected")
                     fragmentManager.beginTransaction()
                         .replace(R.id.mainFragmentContainer, PeopleFragment(), "people_fragment")
                         .addToBackStack("people_backstack")
@@ -73,7 +66,6 @@ class MainActivity : AppCompatActivity() , Navigator{
             fragmentManager.beginTransaction()
                 .replace(R.id.mainFragmentContainer, ChannelsFragment(), "channels_fragment")
                 .commitAllowingStateLoss()
-//            navigateToChannels()
         }
 
         toolBar = findViewById(R.id.mainToolbar)
@@ -84,6 +76,7 @@ class MainActivity : AppCompatActivity() , Navigator{
     override fun onBackPressed() {
         super.onBackPressed()
         supportActionBar?.hide()
+        navigation.visibility = View.VISIBLE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -101,7 +94,6 @@ class MainActivity : AppCompatActivity() , Navigator{
     }
 
     override fun navigateToPeople() {
-        println("debug: navigateToPeople")
         navigation.selectedItemId = R.id.menuPeople
     }
 
@@ -124,9 +116,8 @@ class MainActivity : AppCompatActivity() , Navigator{
     }
 
     override fun showChat(streamName: String, topicName: String?) {
-        println("debug: showChat() streamName=$streamName topicName=$topicName")
         supportFragmentManager.beginTransaction()
-            .replace(R.id.mainFragmentContainer, ChatFragment.newInstance(streamName, topicName))
+            .add(R.id.mainFragmentContainer, ChatFragment.newInstance(streamName, topicName))
             .addToBackStack(null)
             .commitAllowingStateLoss()
 

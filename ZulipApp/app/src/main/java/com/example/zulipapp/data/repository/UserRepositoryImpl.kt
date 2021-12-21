@@ -13,7 +13,6 @@ class UserRepositoryImpl(
     private val localDataSource: LocalUserDataSource
 ) : UserRepository {
     override fun getAllUsers(): Observable<List<User>> {
-        println("debug: Repository: getAllUsers")
 //        return Observable.merge(
 //            localDataSource.getAllUsers().toObservable(),
 //            networkDataSource.getAllUsers()
@@ -29,7 +28,6 @@ class UserRepositoryImpl(
 //        }.toObservable()
 
         return networkDataSource.getAllUsers().toObservable()
-//        return localDataSource.getAllUsers().toObservable()
     }
 
     override fun getUserMe(): Single<User> {

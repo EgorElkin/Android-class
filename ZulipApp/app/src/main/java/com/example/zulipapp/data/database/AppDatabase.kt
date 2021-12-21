@@ -5,7 +5,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.zulipapp.data.database.dao.MessageDao
 import com.example.zulipapp.data.database.dao.StreamDao
-import com.example.zulipapp.data.database.dao.TopicDao
 import com.example.zulipapp.data.database.dao.UserDao
 import com.example.zulipapp.data.database.entity.*
 

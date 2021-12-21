@@ -9,7 +9,7 @@ class ProfileItem(
     var status: String
 ){
     companion object{
-        const val STATUS_ONLINE = "online"
+        const val STATUS_ONLINE = "active"
         const val STATUS_IDLE = "idle"
         const val STATUS_OFFLINE = "offline"
 

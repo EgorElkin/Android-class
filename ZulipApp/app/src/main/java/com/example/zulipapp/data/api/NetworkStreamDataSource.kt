@@ -1,10 +1,10 @@
 package com.example.zulipapp.data.api
 
-import com.example.zulipapp.data.api.mapper.*
+import com.example.zulipapp.data.api.mapper.AllStreamsResponseMapper
+import com.example.zulipapp.data.api.mapper.SubscribedStreamsResponseMapper
+import com.example.zulipapp.data.api.mapper.TopicsResponseMapper
 import com.example.zulipapp.domain.entity.Stream
 import com.example.zulipapp.domain.entity.Topic
-import com.example.zulipapp.domain.entity.User
-import com.example.zulipapp.domain.entity.UserStatus
 import io.reactivex.Single
 
 class NetworkStreamDataSource(private val streamApiService: StreamApiService) {
