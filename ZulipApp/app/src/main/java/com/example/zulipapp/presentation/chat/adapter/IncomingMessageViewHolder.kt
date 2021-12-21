@@ -4,19 +4,20 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zulipapp.R
 import com.example.zulipapp.presentation.view.IncomingMessageViewGroup
-import io.reactivex.subjects.PublishSubject
 
 class IncomingMessageViewHolder(
     itemView: View,
-    private val onReactionClickListener: View.OnClickListener,
-    onPlusClickListener: View.OnClickListener,
+    private val onReactionClickListener: (position: Int, reactionItem: ReactionItem) -> Unit,
+    onPlusClickListener: (Int) -> Unit,
     onMessageLongClickListener: (Int) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val messageView: IncomingMessageViewGroup = itemView.findViewById(R.id.incomingMessageViewGroup)
 
     init {
-        messageView.setOnPlusClickListener(onPlusClickListener)
+        messageView.setOnPlusClickListener {
+            onPlusClickListener(adapterPosition)
+        }
         messageView.getChildAt(IncomingMessageViewGroup.MESSAGE_INDEX).setOnLongClickListener{
             onMessageLongClickListener(adapterPosition)
             true
@@ -27,6 +28,8 @@ class IncomingMessageViewHolder(
         messageView.setAvatar(messageItem.avatarUrl)
         messageView.setUserName(messageItem.userName)
         messageView.setMessageText(messageItem.message)
-        messageView.setReactions(messageItem.reactionItems, onReactionClickListener)
+        messageView.setReactions(messageItem.reactionItems) {
+            onReactionClickListener(adapterPosition, it)
+        }
     }
 }

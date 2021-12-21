@@ -11,12 +11,14 @@ import com.example.zulipapp.data.api.entity.message.Narrow
 import com.example.zulipapp.databinding.FragmentChatBinding
 import com.example.zulipapp.di.DaggerChatComponent
 import com.example.zulipapp.presentation.chat.adapter.ChatAdapter
+import com.example.zulipapp.presentation.chat.adapter.ChatItem
 import com.example.zulipapp.presentation.chat.elm.ChatEffect
 import com.example.zulipapp.presentation.chat.elm.ChatEvent
 import com.example.zulipapp.presentation.chat.elm.ChatState
 import com.example.zulipapp.presentation.chat.reactiondialog.EmojiItem
 import com.example.zulipapp.presentation.chat.reactiondialog.ReactionBottomDialog
 import com.example.zulipapp.presentation.main.MainActivity
+import com.example.zulipapp.presentation.util.Constants
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 
@@ -42,8 +44,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     private lateinit var adapter: ChatAdapter
 
-//    private var streamName: String? = null
-//    private var topicName: String? = null
+    private var selectedMessageId = -1
+    private var selectedPosition = -1
     private var narrows: List<Narrow> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,11 +65,10 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         }
 
         if(topicName != null){
-            binding.chatTopicHeadline.text = topicName
+            binding.chatTopicHeadline.text = getString(R.string.chat_topic_title, topicName)
         } else {
             binding.chatTopicHeadline.visibility = View.GONE
         }
-
 
         binding.chatEditText.doAfterTextChanged {
             if(it.toString().isEmpty()){
@@ -79,21 +80,28 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
         binding.chatButtonSend.setOnClickListener {
             if (streamName != null){
-                store.accept(ChatEvent.Ui.SendButtonClicked("stream", streamName, topicName, binding.chatEditText.text.toString()))
+                store.accept(ChatEvent.Ui.SendButtonClicked("stream", streamName, topicName, binding.chatEditText.text.toString(), narrows))
             }
         }
 
         val manager = LinearLayoutManager(context)
         manager.stackFromEnd = true
         binding.chatRecyclerView.layoutManager = manager
-        adapter = ChatAdapter({
-            TODO("on Emoji Click")
-        },{
+        adapter = ChatAdapter({ position, messageId, reactionItem ->
+            if(reactionItem.userIds.contains(Constants.MY_ID)){
+                store.accept(ChatEvent.Ui.ReactionRemoved(messageId, reactionItem.emojiName, reactionItem.emojiCode, position, narrows))
+            } else {
+                store.accept(ChatEvent.Ui.ReactionSelected(messageId, reactionItem.emojiName, reactionItem.emojiCode, position, narrows))
+            }
+        }, { position, item ->
+            selectedMessageId = (item as ChatItem.MessageItem).messageId
+            selectedPosition = position
             showDialog()
-        },{ item, position ->
-            TODO("on Message Long CLick")
-            true
-        },{
+        }, { position, item ->
+            selectedMessageId = (item as ChatItem.MessageItem).messageId
+            selectedPosition = position
+            showDialog()
+        }, {
             if(!store.currentState.isFullyLoaded){
                 store.accept(ChatEvent.Ui.LoadNextPage(narrows))
             }
@@ -110,12 +118,11 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     }
 
     private fun setResultListener(){
-        childFragmentManager.setFragmentResultListener("reaction_selection", this){ key, bundle ->
-            if(key == "reaction_selection"){
-                val result = bundle.getParcelable<EmojiItem>("emoji")
-                println("debug: Fragment ${result?.emojiCode} selected")
-                TODO("add reaction")
-//                if(result != null) addReaction(selectedMessageId, result)
+        childFragmentManager.setFragmentResultListener(ReactionBottomDialog.REQUEST_KEY, this){ key, bundle ->
+            if(key == ReactionBottomDialog.REQUEST_KEY){
+                val result = bundle.getParcelable<EmojiItem>(ReactionBottomDialog.BUNDLE_KEY)
+                if(result != null)
+                    store.accept(ChatEvent.Ui.ReactionSelected(selectedMessageId, result.emojiName, result.emojiCode, selectedPosition, narrows))
             }
         }
     }
@@ -135,19 +142,34 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     }
 
     override fun render(state: ChatState) {
-        println("debug: ChatFragment: render() oldSize=${adapter.itemCount} addSize=${state.newMessages.size}")
         adapter.addMessages(state.newMessages)
     }
 
     override fun handleEffect(effect: ChatEffect) = when(effect){
-        is ChatEffect.FullyLoaded -> {
-            Toast.makeText(requireContext(), "Вы достигли конца беседы", Toast.LENGTH_SHORT).show()
-        }
         is ChatEffect.ShowLoadingError -> {
-            Toast.makeText(requireContext(), "Ошибка при загрузке", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.chat_loading_error), Toast.LENGTH_SHORT).show()
         }
         is ChatEffect.EmptyMessage -> {
-            Toast.makeText(requireContext(), "Пустое сообщение", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.chat_empty_message), Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.ClearInput -> {
+            binding.chatEditText.setText("")
+        }
+        is ChatEffect.SendingError -> {
+            Toast.makeText(requireContext(), getString(R.string.chat_sending_error), Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.AddReactionError -> {
+            Toast.makeText(requireContext(), getString(R.string.chat_add_reaction_error), Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.RemoveReactionError -> {
+            Toast.makeText(requireContext(), getString(R.string.chat_remove_reaction_error), Toast.LENGTH_SHORT).show()
+        }
+        is ChatEffect.RefreshMessage -> {
+            adapter.refreshMessage(effect.message, effect.position)
+        }
+        is ChatEffect.RefreshChat -> {
+            adapter.insertMessages(effect.messages)
+            binding.chatRecyclerView.scrollToPosition(adapter.itemCount-1)
         }
     }
 }

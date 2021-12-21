@@ -20,7 +20,14 @@
     <string name="channels_loading_error">Произошла ошибка при загрузке</string>
     <string name="profile_toolbar_title">Profile</string>
     <string name="chat_toolbar_title">#%1$s</string>
+    <string name="chat_topic_title">Topic: #%1$s</string>
     <string name="chat_empty_message_notice">Пустое сообщение</string>
     <string name="people_empty_result_text">No Results</string>
     <string name="people_empty_list_text">No People Yet</string>
+    <string name="chat_loading_error">Ошибка при загрузке</string>
+    <string name="chat_sending_error">Ошибка при отправке</string>
+    <string name="chat_add_reaction_error">Ошибка</string>
+    <string name="chat_remove_reaction_error">Ошибка</string>
+    <string name="chat_empty_message">Пустое сообщение</string>
+
 </resources>

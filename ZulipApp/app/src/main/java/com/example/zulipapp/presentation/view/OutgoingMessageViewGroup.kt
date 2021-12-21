@@ -1,14 +1,12 @@
 package com.example.zulipapp.presentation.view
 
 import android.content.Context
-import android.os.Build
-import android.text.Html
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.text.HtmlCompat
 import com.example.zulipapp.R
 import com.example.zulipapp.presentation.chat.adapter.ReactionItem
 import com.example.zulipapp.presentation.util.EmojiCodeMapper
@@ -72,37 +70,21 @@ class OutgoingMessageViewGroup  @JvmOverloads constructor(
             paddingTop + messageView.measuredHeight + marginReactionsTop + reactionsView.measuredHeight)
     }
 
-    @Suppress("DEPRECATION")
     fun setMessageText(message: String){
         messageView.text =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                Html.fromHtml(message, Html.FROM_HTML_MODE_COMPACT).dropLast(1)
-            } else {
-                Html.fromHtml(message).dropLast(1)
-            }
+        HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_COMPACT).dropLast(1)
+
         requestLayout()
     }
 
-    fun addReaction(reactionItem: ReactionItem, clickListener: OnClickListener){
-        val reactionView = ReactionView(context)
-        reactionView.setOnClickListener(clickListener)
-        reactionView.background = ResourcesCompat.getDrawable(resources, R.drawable.reaction_view_bg, context.theme)
-        reactionView.emoji = EmojiCodeMapper.codeToEmoji(reactionItem.emojiCode)
-        reactionView.counter = reactionItem.userIds.size.toString()
-
-        if (reactionsView.childCount == 0){
-            reactionsView.addView(reactionView)
-            reactionsView.addView(plusView)
-        } else {
-            reactionsView.addView(reactionView, reactionsView.childCount) // -1)
-        }
-    }
-
-    fun setReactions(reactionItems: List<ReactionItem>, clickListener: OnClickListener){
+    fun setReactions(reactionItems: List<ReactionItem>, onReactionClickListener: (reaction: ReactionItem) -> Unit){
         reactionsView.removeAllViews()
         reactionItems.forEach { reaction ->
             val reactionView = ReactionView(context)
-            reactionView.setOnClickListener(clickListener)
+            reactionView.setOnClickListener{
+                onReactionClickListener(reaction)
+            }
+            reactionView.isSelected = reaction.isSelected
             reactionView.background = ResourcesCompat.getDrawable(resources, R.drawable.reaction_view_bg, context.theme)
             reactionView.emoji = EmojiCodeMapper.codeToEmoji(reaction.emojiCode)
             reactionView.counter = reaction.userIds.size.toString()
@@ -110,32 +92,6 @@ class OutgoingMessageViewGroup  @JvmOverloads constructor(
         }
         if(reactionsView.childCount > 0) reactionsView.addView(plusView)
     }
-
-
-    fun removeReaction(index: Int){
-        reactionsView.removeViewAt(index)
-        if (reactionsView.childCount == 1){
-            reactionsView.removeViewAt(0)
-        }
-    }
-
-    fun setOnEmojiClickListener(clickListener: View.OnClickListener){
-//        println("debug: onEMOJICLICK()")
-//        reactionsView.children.iterator().forEach {
-//            println("debug: FOR EACH")
-//            it.setOnClickListener(clickListener)
-//        }
-//        reactionsView.setOnClickListener(clickListener)
-    }
-
-    fun setPlusClickListener(clickListener: View.OnClickListener){
-//        flexBox.setOnClickListener(clickListener)
-    }
-
-    fun setMessageLongClickListener(longClickListener: View.OnLongClickListener){
-//        messageView.setOnLongClickListener(longClickListener)
-    }
-
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
         return MarginLayoutParams(context, attrs)

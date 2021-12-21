@@ -3,7 +3,6 @@ package com.example.zulipapp.di
 import com.example.zulipapp.domain.repository.MessageRepository
 import com.example.zulipapp.domain.usecase.*
 import com.example.zulipapp.presentation.chat.elm.*
-import com.example.zulipapp.presentation.people.elm.*
 import dagger.Module
 import dagger.Provides
 import vivid.money.elmslie.core.ElmStoreCompat
@@ -21,14 +20,27 @@ class ChatModule {
 
     @Provides
     @FragmentScope
+    fun provideAddReactionUseCase(messageRepository: MessageRepository): AddReactionUseCase = AddReactionUseCaseImpl(messageRepository)
+
+    @Provides
+    @FragmentScope
+    fun provideRemoveReactionUseCase(messageRepository: MessageRepository): RemoveReactionUseCase = RemoveReactionUseCaseImpl(messageRepository)
+
+    @Provides
+    @FragmentScope
     fun provideChatState(): ChatState {
         return ChatState()
     }
 
     @Provides
     @FragmentScope
-    fun provideChatActor(getMessagesUseCase: GetMessagesUseCase, sendMessageUseCase: SendMessageUseCase): ChatActor {
-        return ChatActor(getMessagesUseCase, sendMessageUseCase)
+    fun provideChatActor(
+        getMessagesUseCase: GetMessagesUseCase,
+        sendMessageUseCase: SendMessageUseCase,
+        addReactionUseCase: AddReactionUseCase,
+        removeReactionUseCase: RemoveReactionUseCase
+    ): ChatActor {
+        return ChatActor(getMessagesUseCase, sendMessageUseCase, addReactionUseCase, removeReactionUseCase)
     }
 
     @Provides

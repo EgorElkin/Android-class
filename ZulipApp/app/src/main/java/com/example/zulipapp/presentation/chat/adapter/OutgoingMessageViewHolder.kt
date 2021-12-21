@@ -7,15 +7,17 @@ import com.example.zulipapp.presentation.view.OutgoingMessageViewGroup
 
 class OutgoingMessageViewHolder(
     itemView: View,
-    private val onReactionClickListener: View.OnClickListener,
-    onPlusClickListener: View.OnClickListener,
+    private val onReactionClickListener: (position: Int, reactionItem: ReactionItem) -> Unit,
+    onPlusClickListener: (Int) -> Unit,
     onMessageLongClickListener: (Int) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val messageView: OutgoingMessageViewGroup = itemView.findViewById(R.id.outgoingMessageViewGroup)
 
     init {
-        messageView.setOnPlusClickListener(onPlusClickListener)
+        messageView.setOnPlusClickListener{
+            onPlusClickListener(adapterPosition)
+        }
         messageView.getChildAt(OutgoingMessageViewGroup.MESSAGE_INDEX).setOnLongClickListener{
             onMessageLongClickListener(adapterPosition)
             true
@@ -24,6 +26,8 @@ class OutgoingMessageViewHolder(
 
     fun bind(messageItem: ChatItem.MessageItem){
         messageView.setMessageText(messageItem.message)
-        messageView.setReactions(messageItem.reactionItems, onReactionClickListener)
+        messageView.setReactions(messageItem.reactionItems) {
+            onReactionClickListener(adapterPosition, it)
+        }
     }
 }

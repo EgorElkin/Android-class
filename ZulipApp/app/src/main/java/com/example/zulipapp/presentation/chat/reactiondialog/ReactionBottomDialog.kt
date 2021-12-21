@@ -25,9 +25,9 @@ class ReactionBottomDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView: RecyclerView = view.findViewById(R.id.bottomSheetRecyclerView )
         val gridLayoutManager = GridLayoutManager(context, columnCount, GridLayoutManager.VERTICAL, false)
-        val map = EmojiContainer.getEmojisMap(requireContext()).map{ EmojiItem(it.key, EmojiCodeMapper.codeToEmoji(it.value)) }
-        val adapter = ReactionAdapter(map){
-            parentFragmentManager.setFragmentResult("reaction_selection", bundleOf("emoji" to it))
+        val map = EmojiContainer.getEmojisMap(requireContext())
+        val adapter = ReactionAdapter(map.map{ EmojiItem(it.key, it.value, EmojiCodeMapper.codeToEmoji(it.value)) }){
+            parentFragmentManager.setFragmentResult(REQUEST_KEY, bundleOf(BUNDLE_KEY to it))
             dismissAllowingStateLoss()
         }
         recyclerView.layoutManager = gridLayoutManager
@@ -36,6 +36,8 @@ class ReactionBottomDialog : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "ReactionBottomDialog"
+        const val REQUEST_KEY = "reaction_selection"
+        const val BUNDLE_KEY = "emoji"
         private const val columnCount = 7
     }
 }

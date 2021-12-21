@@ -12,6 +12,8 @@ interface MessageRepository {
 
     fun fetchMessagesRange(anchor: String, numBefore: Int, numAfter: Int, narrows: List<Narrow>): Single<List<Message>>
 
+    fun fetchMessage(messageId: Int, narrows: List<Narrow>): Single<Message>
+
     fun addReaction(messageId: Int, emojiName: String, emojiCode: String): Single<Boolean>
 
     fun removeReaction(messageId: Int, emojiName: String, emojiCode: String): Single<Boolean>

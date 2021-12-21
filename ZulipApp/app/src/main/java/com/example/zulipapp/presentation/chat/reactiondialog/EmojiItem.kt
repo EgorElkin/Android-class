@@ -5,10 +5,12 @@ import android.os.Parcelable
 
 class EmojiItem(
     val emojiName: String,
-    val emojiCode: String
+    val emojiCode: String,
+    val emojiUniCode: String
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
+        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: ""
     )
@@ -20,6 +22,7 @@ class EmojiItem(
     override fun writeToParcel(out: Parcel, flags: Int) {
         out.writeString(emojiName)
         out.writeString(emojiCode)
+        out.writeString(emojiUniCode)
     }
 
     companion object CREATOR : Parcelable.Creator<EmojiItem> {

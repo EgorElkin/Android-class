@@ -4,5 +4,6 @@ class ReactionItem(
     val emojiName: String,
     val emojiCode: String,
     val reactionType: String,
-    val userIds: MutableList<Int>
+    val userIds: MutableList<Int>,
+    var isSelected: Boolean
 )

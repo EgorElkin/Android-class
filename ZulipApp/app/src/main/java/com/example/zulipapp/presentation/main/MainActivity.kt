@@ -8,7 +8,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.example.zulipapp.App
-import com.example.zulipapp.DaggerMainComponent
 import com.example.zulipapp.R
 import com.example.zulipapp.di.ActivityComponent
 import com.example.zulipapp.di.ChannelsComponent

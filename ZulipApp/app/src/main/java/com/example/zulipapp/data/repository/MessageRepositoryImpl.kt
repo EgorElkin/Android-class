@@ -6,6 +6,7 @@ import com.example.zulipapp.data.api.mapper.ResponseToMessageMapper
 import com.example.zulipapp.data.database.LocalMessageDataSource
 import com.example.zulipapp.domain.entity.Message
 import com.example.zulipapp.domain.repository.MessageRepository
+import io.reactivex.Completable
 import io.reactivex.Single
 
 class MessageRepositoryImpl(
@@ -25,11 +26,25 @@ class MessageRepositoryImpl(
         return networkDataSource.fetchMessagesRange(anchor, numBefore, numAfter, narrows).map(ResponseToMessageMapper())
     }
 
+    override fun fetchMessage(messageId: Int, narrows: List<Narrow>): Single<Message> {
+        return networkDataSource.fetchMessagesRange(messageId, 0, 0, narrows)
+            .map(ResponseToMessageMapper())
+            .map {
+                it.first()
+            }
+    }
+
     override fun addReaction(messageId: Int, emojiName: String, emojiCode: String): Single<Boolean> {
-        TODO("Not yet implemented")
+        return networkDataSource.addReaction(messageId, emojiName, emojiCode)
+            .map {
+                it.result == "success"
+            }
     }
 
     override fun removeReaction(messageId: Int, emojiName: String, emojiCode: String): Single<Boolean> {
-        TODO("Not yet implemented")
+        return networkDataSource.removeReaction(messageId, emojiName, emojiCode)
+            .map {
+                it.result == "success"
+            }
     }
 }

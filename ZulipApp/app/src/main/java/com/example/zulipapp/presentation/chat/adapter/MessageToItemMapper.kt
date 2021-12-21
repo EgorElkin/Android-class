@@ -46,11 +46,13 @@ class MessageToItemMapper : (List<Message>) ->  List<ChatItem>{
                         it.emojiName,
                         it.emojiCode,
                         it.reactionType,
-                        mutableListOf(it.userId)
+                        mutableListOf(it.userId),
+                        it.userId == Constants.MY_ID
                     )
                 )
             } else {
                 newList.last().userIds.add(it.userId)
+                if (it.userId == Constants.MY_ID) newList.last().isSelected = true
             }
         }
         newList.sortByDescending { it.userIds.size }

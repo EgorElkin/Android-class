@@ -23,7 +23,7 @@ class ReactionAdapter(
         }
 
         fun bind(emoji: EmojiItem) {
-            emojiView.text = emoji.emojiCode
+            emojiView.text = emoji.emojiUniCode
         }
     }
 
