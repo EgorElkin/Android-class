@@ -7,7 +7,9 @@ import com.example.zulipapp.domain.entity.UserStatus
 
 class AllUsersResponseMapper : (UsersResponse) -> List<User> {
     override fun invoke(response: UsersResponse): List<User> {
-        return response.allUsers.map {
+        return response.allUsers.filter {
+            !it.isBot && it.isActive
+        }.map {
             User(
                 it.id,
                 it.name,

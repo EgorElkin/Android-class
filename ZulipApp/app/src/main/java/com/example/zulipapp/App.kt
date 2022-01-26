@@ -10,7 +10,7 @@ class App : Application() {
     internal val appComponent: AppComponent
         get() = checkNotNull(_appComponent){
                 "AppComponent isn't initialized"
-            }
+        }
 
     override fun onCreate() {
         super.onCreate()

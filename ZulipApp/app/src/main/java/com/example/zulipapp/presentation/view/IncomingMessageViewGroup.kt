@@ -102,7 +102,7 @@ class IncomingMessageViewGroup  @JvmOverloads constructor(
 
     fun setMessageText(message: String){
         messageView.text =
-        HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_COMPACT).dropLast(1)
+        HtmlCompat.fromHtml(message, HtmlCompat.FROM_HTML_MODE_LEGACY).dropLast(2)
         requestLayout()
     }
 

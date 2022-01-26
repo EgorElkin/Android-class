@@ -22,9 +22,8 @@ class ProfileActor(
                     },{ profile, status ->
                         profile.status = status.status
                         ProfileEvent.Internal.ProfileLoaded(profile) as ProfileEvent
-                    }).doOnError {
-                        ProfileEvent.Internal.ErrorLoading(it)
-                    }
+                    })
+                    .doOnError { ProfileEvent.Internal.ErrorLoading(it) }
             }
         }
     }

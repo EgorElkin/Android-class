@@ -15,4 +15,6 @@ class LocalUserDataSource(private val userDao: UserDao) {
     fun getAllUsers(): Single<List<User>> = userDao.getAllUsers().map(EntitiesToUsersMapper())
 
     fun getUserById(userId: Int): Single<User> = userDao.getUserById(userId).map(EntityToUserMapper())
+
+    fun deleteAll(): Completable = userDao.deleteAll()
 }

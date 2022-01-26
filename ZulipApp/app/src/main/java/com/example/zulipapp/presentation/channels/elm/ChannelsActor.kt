@@ -15,63 +15,70 @@ class ChannelsActor(
 ) : ActorCompat<ChannelsCommand, ChannelsEvent> {
 
     override fun execute(command: ChannelsCommand): Observable<ChannelsEvent> {
-        when (command) {
+        when(command){
             is ChannelsCommand.LoadSubscribedStreams -> {
-                return getSubscribedStreamsUseCase()
-                    .map(StreamToItemMapper())
-                    .flatMap { streams ->
-                        Observable.fromIterable(streams)
-                    }
-                    .flatMap({ stream ->
-                        getTopicsUseCase(stream.id).map(TopicToItemMapper())
-                    }, { stream, topics ->
-                        topics.map { it.streamName = stream.name }
-                        stream.topics = topics
-                        stream
-                    })
-                    .toList()
-                    .map { ChannelsEvent.Internal.SubscribedLoadingSuccess(it) as ChannelsEvent }
-                    .doOnError { ChannelsEvent.Internal.SubscribedLoadingError(it) }
-                    .toObservable()
+                 return getSubscribedStreamsUseCase()
+                     .map(StreamToItemMapper())
+                     .flatMap { streams ->
+                         Observable.fromIterable(streams)
+                     }
+                     .flatMap({ stream ->
+                         getTopicsUseCase(stream.id).map(TopicToItemMapper())
+                     }, { stream, topics ->
+                         topics.map { it.streamName = stream.name }
+                         stream.topics = topics
+                         stream
+                     })
+                     .toList()
+                     .map {
+                         ChannelsEvent.Internal.SubscribedLoadingSuccess(it) as ChannelsEvent
+                     }
+                     .onErrorReturn {
+                        ChannelsEvent.Internal.SubscribedLoadingError(it)
+                     }
+                     .toObservable()
             }
+
+            is ChannelsCommand.LoadAllStreams -> {
+                 return getAllStreamsUseCase()
+                     .map(StreamToItemMapper())
+                     .flatMap { streams ->
+                         Observable.fromIterable(streams)
+                     }
+                     .flatMap({ stream ->
+                         getTopicsUseCase(stream.id).map(TopicToItemMapper())
+                     }, { stream, topics ->
+                         topics.map { it.streamName = stream.name }
+                         stream.topics = topics
+                         stream
+                     })
+                     .toList()
+                     .map {
+                         ChannelsEvent.Internal.AllLoadingSuccess(it) as ChannelsEvent
+                     }
+                     .onErrorReturn {
+                         ChannelsEvent.Internal.AllLoadingError(it)
+                     }
+                     .toObservable()
+            }
+
             is ChannelsCommand.SearchSubscribedStreams -> {
                 val newList = command.streams
                     .filter { stream ->
-                        stream.name.contains(command.searchQuery, ignoreCase = true) ||
-                                stream.topics.any { topic ->
-                                    topic.name.contains(command.searchQuery, ignoreCase = true)
-                                }
+                        stream.name.contains(command.searchQuery, ignoreCase = true)
                     }
-                return Observable.just(ChannelsEvent.Internal.SubscribedSearchingSuccess(newList))
+                return Observable.just(ChannelsEvent.Internal.SubscribedSearchSuccess(newList, command.searchQuery))
             }
-            is ChannelsCommand.LoadAllStreams -> {
-                return getAllStreamsUseCase()
-                    .map(StreamToItemMapper())
-                    .flatMap { streams ->
-                        Observable.fromIterable(streams)
-                    }
-                    .flatMap({ stream ->
-                        getTopicsUseCase(stream.id).map(TopicToItemMapper())
-                    }, { stream, topics ->
-                        topics.map { it.streamName = stream.name }
-                        stream.topics = topics
-                        stream
-                    })
-                    .toList()
-                    .map { ChannelsEvent.Internal.AllLoadingSuccess(it) as ChannelsEvent }
-                    .doOnError { ChannelsEvent.Internal.AllLoadingError(it) }
-                    .toObservable()
-            }
+
             is ChannelsCommand.SearchAllStreams -> {
                 val newList = command.streams
                     .filter { stream ->
-                        stream.name.contains(command.searchQuery, ignoreCase = true) ||
-                                stream.topics.any { topic ->
-                                    topic.name.contains(command.searchQuery, ignoreCase = true)
-                                }
+                    stream.name.contains(command.searchQuery, ignoreCase = true)
                     }
-                return Observable.just(ChannelsEvent.Internal.AllSearchingSuccess(newList))
+                return Observable.just(ChannelsEvent.Internal.AllSearchSuccess(newList, command.searchQuery))
             }
         }
     }
+
+
 }

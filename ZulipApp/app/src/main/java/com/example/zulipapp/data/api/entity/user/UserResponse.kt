@@ -10,5 +10,9 @@ class UserResponse(
     @SerializedName("full_name")
     val name: String,
     @SerializedName("avatar_url")
-    val avatarUrl: String
+    val avatarUrl: String,
+    @SerializedName("is_bot")
+    val isBot: Boolean,
+    @SerializedName("is_active")
+    val isActive: Boolean
 )

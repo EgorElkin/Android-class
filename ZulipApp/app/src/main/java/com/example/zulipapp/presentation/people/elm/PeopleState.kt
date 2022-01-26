@@ -4,8 +4,8 @@ import com.example.zulipapp.presentation.people.adapter.UserItem
 
 data class PeopleState(
     val isLoading: Boolean = false,
-    val allUsers: List<UserItem>? = null,
-    val searchedUsers: List<UserItem>? = null,
+//    val allUsers: List<UserItem>? = null,
+    val searchedUsers: List<UserItem> = emptyList(),
     val emptyList: Boolean = false,
     val emptySearchResult: Boolean = false
 )

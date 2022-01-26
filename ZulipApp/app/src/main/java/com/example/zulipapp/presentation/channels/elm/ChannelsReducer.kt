@@ -1,145 +1,147 @@
 package com.example.zulipapp.presentation.channels.elm
 
-import com.example.zulipapp.presentation.channels.ChannelsViewPagerAdapter
-import com.example.zulipapp.presentation.channels.adapter.ChannelsItem
 import vivid.money.elmslie.core.store.dsl_reducer.ScreenDslReducer
 
 class ChannelsReducer :
     ScreenDslReducer<ChannelsEvent, ChannelsEvent.Ui, ChannelsEvent.Internal, ChannelsState, ChannelsEffect, ChannelsCommand>(
-        ChannelsEvent.Ui::class,
-        ChannelsEvent.Internal::class
-    ) {
+        ChannelsEvent.Ui::class, ChannelsEvent.Internal::class
+    ){
 
-    private var subscribedStreams: List<ChannelsItem.StreamItem>? = null
-    private var allStreams: List<ChannelsItem.StreamItem>? = null
-    private var subscribedSearchQuery: String = ""
-    private var allSearchQuery: String = ""
+    override fun Result.internal(event: ChannelsEvent.Internal): Any {
+        return when(event) {
+            is ChannelsEvent.Internal.SubscribedLoadingSuccess -> {
+                state { copy(subscribedFullList = event.streams) }
+                commands { +ChannelsCommand.SearchSubscribedStreams(event.streams, INITIAL_SEARCH) } // just start searching
+            }
+            is ChannelsEvent.Internal.SubscribedLoadingError -> {
+                effects { +ChannelsEffect.ShowLoadingError }
+                state { copy(subscribedIsLoading = false) }
+            }
+            is ChannelsEvent.Internal.SubscribedSearchSuccess -> {
+                state { copy(
+                    subscribedIsLoading = false,
+                    subscribedSearchQuery = event.searchQuery,
+                    subscribedSearchedList = event.streams
+                ) }
+            }
 
-    override fun Result.internal(event: ChannelsEvent.Internal) = when (event) {
-
-        is ChannelsEvent.Internal.SubscribedLoadingSuccess -> {
-            subscribedStreams = event.streams
-            state { copy(isSubscribedLoading = false, searchedSubscribedStreams = emptyList()) }
-            commands { +ChannelsCommand.SearchSubscribedStreams(event.streams, subscribedSearchQuery) }
-        }
-        is ChannelsEvent.Internal.SubscribedSearchingSuccess -> {
-            state { copy(isSubscribedLoading = false, searchedSubscribedStreams = event.streams) }
-        }
-        is ChannelsEvent.Internal.SubscribedLoadingError -> {
-            state { copy(isSubscribedLoading = false) }
-            effects { +ChannelsEffect.ShowLoadingError }
-        }
-
-        is ChannelsEvent.Internal.AllLoadingSuccess -> {
-            allStreams = event.streams
-            state { copy(isAllLoading = false, searchedAllStreams = emptyList()) }
-            commands { +ChannelsCommand.SearchAllStreams(event.streams, allSearchQuery) }
-        }
-        is ChannelsEvent.Internal.AllSearchingSuccess -> {
-            state { copy(isAllLoading = false, searchedAllStreams = event.streams) }
-        }
-        is ChannelsEvent.Internal.AllLoadingError -> {
-            state { copy(isAllLoading = false) }
-            effects { +ChannelsEffect.ShowLoadingError }
+            is ChannelsEvent.Internal.AllLoadingSuccess -> {
+                state { copy(allFullList = event.streams) }
+                commands { +ChannelsCommand.SearchAllStreams(event.streams, INITIAL_SEARCH) } // just start searching
+            }
+            is ChannelsEvent.Internal.AllLoadingError -> {
+                effects { +ChannelsEffect.ShowLoadingError }
+                state { copy(allIsLoading = false) }
+            }
+            is ChannelsEvent.Internal.AllSearchSuccess -> {
+                state { copy(
+                    allIsLoading = false,
+                    allSearchQuery = event.searchQuery,
+                    allSearchedList = event.streams
+                ) }
+            }
         }
     }
 
-    override fun Result.ui(event: ChannelsEvent.Ui) = when (event) {
-        is ChannelsEvent.Ui.Init -> {
-            state { copy(isSubscribedLoading = true, isAllLoading = true) }
-            commands { +ChannelsCommand.LoadSubscribedStreams }
-            commands { +ChannelsCommand.LoadAllStreams }
-        }
-        is ChannelsEvent.Ui.SearchQueryChanged -> {
-            when(event.position){
-                ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
-                    if (!state.isSubscribedLoading && subscribedStreams != null){
-                        subscribedSearchQuery = event.searchQuery
-                        state { copy(isSubscribedLoading = true, searchedSubscribedStreams = emptyList()) }
-                        commands { +ChannelsCommand.SearchSubscribedStreams(subscribedStreams!!, event.searchQuery) }
-                    } else {
-                        state { copy() }
-                    }
-                }
-                ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
-                    if (!state.isAllLoading && allStreams != null){
-                        allSearchQuery = event.searchQuery
-                        state { copy(isAllLoading = true, searchedAllStreams = emptyList()) }
-                        commands { +ChannelsCommand.SearchAllStreams(allStreams!!, event.searchQuery) }
-                    } else {
-                        state { copy() }
-                    }
-                }
-                else -> {
-                    throw IllegalArgumentException("ChannelsReducer: Tab position does not exist")
-                }
+    override fun Result.ui(event: ChannelsEvent.Ui): Any {
+        return when(event){
+            is ChannelsEvent.Ui.Init -> {
+                state { copy(subscribedIsLoading = true, allIsLoading = true) }
+                commands { +ChannelsCommand.LoadSubscribedStreams }
+                commands { +ChannelsCommand.LoadAllStreams }
             }
-        }
-        is ChannelsEvent.Ui.SearchButtonClicked -> {
-            when(event.position){
-                ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
-                    if (!state.isSubscribedLoading && subscribedStreams != null){
-                        subscribedSearchQuery = event.searchQuery
-                        state { copy(isSubscribedLoading = true, searchedSubscribedStreams = emptyList()) }
-                        commands { +ChannelsCommand.SearchSubscribedStreams(subscribedStreams!!, event.searchQuery) }
-                    } else {
-                        state { copy() }
-                    }
-                }
-                ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
-                    if (!state.isAllLoading && allStreams != null){
-                        allSearchQuery = event.searchQuery
-                        state { copy(isAllLoading = true, searchedAllStreams = emptyList()) }
-                        commands { +ChannelsCommand.SearchAllStreams(allStreams!!, event.searchQuery) }
-                    } else {
-                        state { copy() }
-                    }
-                }
-                else -> {
-                    throw IllegalArgumentException("ChannelsReducer: Tab position does not exist")
-                }
-            }
-        }
-        is ChannelsEvent.Ui.TabChanged -> {
-            when(event.newPosition){
-                ChannelsViewPagerAdapter.SUBSCRIBED_FRAGMENT_POSITION -> {
-                    if(!state.isSubscribedLoading){
-                        if(event.searchQuery != subscribedSearchQuery && subscribedStreams != null){
-                            subscribedSearchQuery = event.searchQuery
-                            state { copy(isSubscribedLoading = true, searchedSubscribedStreams = emptyList()) }
-                            commands { +ChannelsCommand.SearchSubscribedStreams(subscribedStreams!!, event.searchQuery) }
+
+            is ChannelsEvent.Ui.SearchQueryChanged -> {
+                when(event.position){
+                    0 -> {
+                        if(!state.subscribedIsLoading && !state.subscribedFullList.isNullOrEmpty()){
+                            commands { +ChannelsCommand.SearchSubscribedStreams(state.subscribedFullList!!, event.searchQuery) }
                         } else {
-                            state{ copy() }
+                            Any()
                         }
-                    } else {
-                        state{ copy() }
                     }
-                }
-                ChannelsViewPagerAdapter.ALL_STREAMS_FRAGMENT_POSITION -> {
-                    if(!state.isAllLoading){
-                        if(event.searchQuery != allSearchQuery && allStreams != null){
-                            allSearchQuery = event.searchQuery
-                            state{ copy(isAllLoading = true, searchedAllStreams = emptyList()) }
-                            commands { +ChannelsCommand.SearchAllStreams(allStreams!!, event.searchQuery) }
+                    1 -> {
+                        if(!state.allIsLoading && !state.allFullList.isNullOrEmpty()){
+                            commands { +ChannelsCommand.SearchAllStreams(state.allFullList!!, event.searchQuery) }
                         } else {
-                            state{ copy() }
+                            Any()
                         }
-                    } else {
-                        state{ copy() }
                     }
-                }
-                else -> {
-                    throw IllegalArgumentException("Reducer: Tab position does not exist")
+                    else -> {
+                        Any()
+                    }
                 }
             }
-        }
-        is ChannelsEvent.Ui.StreamSelected -> {
-            effects { +ChannelsEffect.NavigateToStream(event.stream) }
-        }
-        is ChannelsEvent.Ui.TopicSelected -> {
-            effects { +ChannelsEffect.NavigateToTopic(event.topic) }
+
+            is ChannelsEvent.Ui.SearchButtonClicked -> {
+                when(event.position){
+                    0 -> {
+                        if(!state.subscribedIsLoading && !state.subscribedFullList.isNullOrEmpty() && state.subscribedSearchQuery != event.searchQuery){
+                            commands { +ChannelsCommand.SearchSubscribedStreams(state.subscribedFullList!!, event.searchQuery) }
+                        } else {
+                            Any()
+                        }
+                    }
+                    1 -> {
+                        if(!state.allIsLoading && !state.allFullList.isNullOrEmpty() && state.allSearchQuery != event.searchQuery){
+                            commands { +ChannelsCommand.SearchAllStreams(state.allFullList!!, event.searchQuery) }
+                        } else {
+                            Any()
+                        }
+                    }
+                    else -> {
+                        Any()
+                    }
+                }
+            }
+
+            is ChannelsEvent.Ui.TabChanged -> {
+                if(state.currentPosition != event.newPosition){
+                    when(event.newPosition){
+                        0 -> {
+                            if(!state.subscribedIsLoading && !state.subscribedFullList.isNullOrEmpty()){
+                                if(event.searchQuery != state.subscribedSearchQuery){
+                                    commands { +ChannelsCommand.SearchSubscribedStreams(state.subscribedFullList!!, event.searchQuery) }
+                                } else {
+                                    Any()
+                                }
+                            } else {
+                                Any()
+                            }
+                            state { copy(currentPosition = event.newPosition) }
+                        }
+                        1 -> {
+                            if(state.allIsLoading){
+                                Any()
+                            } else {
+                                if(event.searchQuery != state.allSearchQuery){
+                                    commands { +ChannelsCommand.SearchAllStreams(state.allFullList!!, event.searchQuery) }
+                                } else {
+                                    Any()
+                                }
+                            }
+                            state { copy(currentPosition = event.newPosition) }
+                        }
+                        else -> {
+                            Any()
+                        }
+                    }
+                } else {
+                    Any()
+                }
+            }
+
+            is ChannelsEvent.Ui.TopicSelected -> {
+                effects { +ChannelsEffect.NavigateToTopic(event.topic) }
+            }
+
+            is ChannelsEvent.Ui.StreamSelected -> {
+                effects { +ChannelsEffect.NavigateToStream(event.stream) }
+            }
         }
     }
 
-
+    companion object{
+        const val INITIAL_SEARCH = ""
+    }
 }

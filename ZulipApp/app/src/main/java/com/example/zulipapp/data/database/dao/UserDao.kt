@@ -22,4 +22,7 @@ interface UserDao {
 
     @Delete
     fun delete(user: UserEntity): Completable
+
+    @Query("DELETE FROM USERS_TABLE")
+    fun deleteAll(): Completable
 }

@@ -39,16 +39,16 @@ class ChannelsViewPagerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.channels_view_pager_item, parent, false)
         return when(viewType){
-            SUBSCRIBED_FRAGMENT_POSITION -> PageViewHolder(view, channelsSubscribedAdapter)
-            ALL_STREAMS_FRAGMENT_POSITION -> PageViewHolder(view, channelsAllAdapter)
+            SUBSCRIBED_POSITION -> PageViewHolder(view, channelsSubscribedAdapter)
+            ALL_STREAMS_POSITION -> PageViewHolder(view, channelsAllAdapter)
             else -> throw IllegalArgumentException("ChannelsViewPagerAdapter: onCreateVIewHOlder(): Unknown ViewType")
         }
     }
 
     override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
         when(position){
-            SUBSCRIBED_FRAGMENT_POSITION -> holder.bind(subscribedChannels)
-            ALL_STREAMS_FRAGMENT_POSITION -> holder.bind(allChannels)
+            SUBSCRIBED_POSITION -> holder.bind(subscribedChannels)
+            ALL_STREAMS_POSITION -> holder.bind(allChannels)
         }
     }
 
@@ -63,18 +63,18 @@ class ChannelsViewPagerAdapter(
     fun setSubscribedStreams(newList: List<ChannelsItem>){
         subscribedChannels.clear()
         subscribedChannels.addAll(newList)
-        notifyItemChanged(SUBSCRIBED_FRAGMENT_POSITION)
+        notifyItemChanged(SUBSCRIBED_POSITION)
     }
 
     fun setAllStreams(newList: List<ChannelsItem>){
         allChannels.clear()
         allChannels.addAll(newList)
-        notifyItemChanged(ALL_STREAMS_FRAGMENT_POSITION)
+        notifyItemChanged(ALL_STREAMS_POSITION)
     }
 
     companion object{
         const val ITEMS_COUNT = 2
-        const val SUBSCRIBED_FRAGMENT_POSITION = 0
-        const val ALL_STREAMS_FRAGMENT_POSITION = 1
+        const val SUBSCRIBED_POSITION = 0
+        const val ALL_STREAMS_POSITION = 1
     }
 }

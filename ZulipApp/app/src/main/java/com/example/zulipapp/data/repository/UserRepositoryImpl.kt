@@ -7,6 +7,7 @@ import com.example.zulipapp.domain.entity.UserStatus
 import com.example.zulipapp.domain.repository.UserRepository
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 
 class UserRepositoryImpl(
     private val networkDataSource: NetworkUserDataSource,
@@ -22,12 +23,79 @@ class UserRepositoryImpl(
 ////                }
 //                .toObservable()
 //        )
-//        return networkDataSource.getAllUsers().doOnSuccess {
-//            println("debug: save fetching results")
-//            localDataSource.addAllUsers(it)
+
+        return localDataSource.getAllUsers()
+            .flatMapObservable { localUsers ->
+                println("debug: flatMapObservable local=${localUsers.size}")
+                networkDataSource.getAllUsers()
+                    .toObservable()
+                    .filter { apiUsers ->
+                        println("debug: filter: api=${apiUsers.size} filter=${apiUsers != localUsers}")
+                        apiUsers != localUsers
+                    }
+                    .flatMapSingle { apiUsers ->
+                        println("debug: flatMapSingle api=${apiUsers.size}")
+                        localDataSource.deleteAll().andThen(
+                                localDataSource.addAllUsers(apiUsers).andThen(
+                                    Single.just(apiUsers.sortedBy { it.name })
+                                )
+                            )
+                    }
+                    .startWith(localUsers.sortedBy { it.name })
+            }
+
+//        return networkDataSource.getAllUsers()
+//            .doOnSuccess {
+//                println("debug: save fetching results ${it.size}")
+
+
+//                CompositeDisposable().addAll(
+//                    localDataSource.deleteAll()
+//                        .doOnComplete {
+//                            println("debug: delete: doOnComplete")
+//                        }
+//                        .doOnError { error ->
+//                            println("debug: delete: doOnError: $error")
+//                        }
+//                        .subscribe({
+//                            println("debug: delete: COMPETE")
+//                        },{ error ->
+//                            println("debug: delete: ERROR: $error")
+//                        })
+//                    ,
+//                    localDataSource.addAllUsers(it)
+//                        .doOnComplete {
+//                            println("debug: insert: doOnComplete")
+//                        }
+//                        .doOnError { error ->
+//                            println("debug: insert: doOnError: $error")
+//                        }
+//                        .subscribe({
+//                            println("debug: insert: COMPLETE")
+//                        },{ error ->
+//                            println("debug: insert: ERROR: $error")
+//                        })
+//                )
+
+//                CompositeDisposable().add(
+//                    localDataSource.getAllUsers()
+//                        .doOnSuccess { users ->
+//                            println("debug: doOnComplete: ${users.size}")
+//                        }
+//                        .doOnError { error ->
+//                            println("debug: doOnError: $error")
+//                        }
+//                        .subscribe({ users ->
+//                            println("debug: COMPLETE: ${users.isNullOrEmpty()}")
+//                        },{ error ->
+//                            println("debug: ERROR: $error")
+//                        })
+//                )
+
 //        }.toObservable()
 
-        return networkDataSource.getAllUsers().toObservable()
+//        return localDataSource.getAllUsers().toObservable()
+//        return networkDataSource.getAllUsers().toObservable()
     }
 
     override fun getUserMe(): Single<User> {

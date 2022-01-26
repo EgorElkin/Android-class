@@ -1,5 +1,6 @@
 package com.example.zulipapp.presentation.people.elm
 
+import com.example.zulipapp.presentation.people.adapter.UserItem
 import vivid.money.elmslie.core.store.dsl_reducer.ScreenDslReducer
 
 class PeopleReducer :
@@ -8,13 +9,23 @@ class PeopleReducer :
         PeopleEvent.Internal::class
 ) {
 
+    private var allPeople: List<UserItem> = emptyList()
+
     override fun Result.internal(event: PeopleEvent.Internal) = when(event) {
         is PeopleEvent.Internal.PeopleLoadingSuccess -> {
+            println("debug: Reducer: Internal success")
             if(event.users.isEmpty()){
-                state{ copy(isLoading = false, allUsers = event.users, emptyList = true, emptySearchResult = false) }
+                state{ copy(isLoading = false, emptyList = true, emptySearchResult = false) }
             } else {
-                state{ copy(isLoading = false, allUsers = event.users, searchedUsers = event.users, emptyList = false, emptySearchResult = false) }
+                allPeople = event.users
+                state{ copy(isLoading = false, emptyList = false, emptySearchResult = false) }
+                commands { +PeopleCommand.SearchPeople(allPeople, ALL_USERS_QUERY) }
             }
+        }
+        is PeopleEvent.Internal.LoadingError -> {
+            println("debug: Reducer: Internal error")
+            state { copy(isLoading = false) }
+            effects { +PeopleEffect.ShowLoadingError }
         }
         is PeopleEvent.Internal.PeopleSearchingSuccess -> {
             if(event.users.isEmpty()){
@@ -23,10 +34,6 @@ class PeopleReducer :
                 state { copy(isLoading = false, searchedUsers = event.users, emptyList = false, emptySearchResult = false) }
             }
         }
-        is PeopleEvent.Internal.LoadingError -> {
-            state { copy(isLoading = false) }
-            effects { +PeopleEffect.ShowLoadingError }
-        }
     }
 
     override fun Result.ui(event: PeopleEvent.Ui) = when(event) {
@@ -34,18 +41,17 @@ class PeopleReducer :
             state {
                 copy(
                     isLoading = true,
-                    allUsers = emptyList(),
-                    searchedUsers = null,
-                    emptyList = false,
-                    emptySearchResult = false
+//                    searchedUsers = emptyList(),
+//                    emptyList = false,
+//                    emptySearchResult = false
                 )
             }
             commands { +PeopleCommand.LoadPeople }
         }
         is PeopleEvent.Ui.SearchPeople -> {
-            if (!state.isLoading && !state.allUsers.isNullOrEmpty()) {
+            if (!state.isLoading && allPeople.isNotEmpty()) {
                 state { copy(isLoading = true, searchedUsers = emptyList()) }
-                commands { +PeopleCommand.SearchPeople(state.allUsers!!, event.searchQuery) }
+                commands { +PeopleCommand.SearchPeople(allPeople, event.searchQuery) }
             } else {
                 state { copy() }
             }
@@ -53,5 +59,9 @@ class PeopleReducer :
         is PeopleEvent.Ui.UserSelected -> {
             effects { +PeopleEffect.NavigateToProfile(event.userId) }
         }
+    }
+
+    companion object{
+        private const val ALL_USERS_QUERY = ""
     }
 }
